@@ -1,6 +1,9 @@
 package chess;
 
 import java.util.Collection;
+import piecemoves.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -11,10 +14,34 @@ import java.util.Collection;
 public class ChessPiece {
     private ChessGame.TeamColor pieceColor;
     private ChessPiece.PieceType type;
+    private Collection<ChessMove> moves;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type && Objects.equals(moves, that.moves);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type, moves);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                ", moves=" + moves +
+                '}';
     }
 
     /**
@@ -51,6 +78,11 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        if (type == PieceType.BISHOP) {
+            return BishopMove.getBishopMoves(board, myPosition);
+        }
+        else {
+            throw new RuntimeException("Not implemented");
+        }
     }
 }
