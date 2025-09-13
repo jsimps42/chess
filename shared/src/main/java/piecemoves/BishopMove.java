@@ -19,22 +19,23 @@ public class BishopMove {
                 row += posMovRow[i];
                 col += posMovCol[i];
 
-                if (row < 0 || row > 7 || col < 0 || col > 7) {
+                if (row < 1 || row > 8 || col < 1 || col > 8) { //stop if out of bounds
                     break;
                 }
 
-                ChessPosition potentialPos = new ChessPosition(row, col);
-                ChessPiece potentialPosPiece = board.getPiece(potentialPos);
+                ChessPosition potentialPos = new ChessPosition(row, col); //examine potential space
+                ChessPiece potentialPosPiece = board.getPiece(potentialPos); //and if a piece is present
 
-                if (potentialPosPiece == null) {
+                if (potentialPosPiece == null) { //empty space so valid move
                     moves.add(new ChessMove(start, potentialPos, null));
                 }
 
-                else if (potentialPosPiece.getTeamColor() != bishop.getTeamColor()) {
+                else if (potentialPosPiece.getTeamColor() != bishop.getTeamColor()) { //occupied by enemy so still valid
                     moves.add(new ChessMove(start, potentialPos, null));
+                    break;
                 }
-                
-                else {
+
+                else { //ally on space makes for invalid move
                     break;
                 }
             }
