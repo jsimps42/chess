@@ -2,7 +2,6 @@ package chess;
 
 import java.util.Collection;
 import piecemoves.*;
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -58,8 +57,23 @@ public class ChessPiece {
         if (type == PieceType.BISHOP) {
             return BishopMove.getBishopMoves(board, myPosition);
         }
+        else if (type == PieceType.KING) {
+            return KingMove.getKingMoves(board, myPosition);
+        }
+        else if (type == PieceType.KNIGHT) {
+            return KnightMove.getKnightMoves(board, myPosition);
+        }
+        else if (type == PieceType.QUEEN) {
+            return QueenMove.getQueenMoves(board, myPosition);
+        }
+        else if (type == PieceType.ROOK) {
+            return RookMove.getRookMoves(board, myPosition);
+        }
+        else if (type == PieceType.PAWN) {
+            return PawnMove.getPawnMoves(board, myPosition);
+        }
         else {
-            throw new RuntimeException("Not implemented");
+            return null;
         }
     }
 
