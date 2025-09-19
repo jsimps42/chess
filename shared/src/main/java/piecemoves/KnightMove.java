@@ -19,22 +19,21 @@ public class KnightMove {
                 if (j == 0) { //knight doesn't have possible moves in same col
                     j--;
                 }
+                int row = start.getRow() + i;
+                int col = start.getColumn() + j;
 
-                if (Math.abs(i) != Math.abs(j)) { //must be L shaped move
-                    int row = start.getRow() + i;
-                    int col = start.getColumn() + j;
+                if (Math.abs(i) != Math.abs(j) && //must be L shaped move
+                    row >= 1 && row <= 8 && col >= 1 && col <= 8) { //and must be in bounds
+                        
+                    ChessPosition potentialPos = new ChessPosition(row, col); //examine potential space
+                    ChessPiece potentialPosPiece = board.getPiece(potentialPos); //and if a piece is present
 
-                    if (row >= 1 && row <= 8 && col >= 1 && col <= 8) { //stay in bounds
-                        ChessPosition potentialPos = new ChessPosition(row, col); //examine potential space
-                        ChessPiece potentialPosPiece = board.getPiece(potentialPos); //and if a piece is present
-
-                        if (potentialPosPiece == null || //empty space is valid
-                        potentialPosPiece.getTeamColor() != knight.getTeamColor()) { //enemy space is valid
-                            moves.add(new ChessMove(start, potentialPos, null));
-                        }
-                    }    
+                    if (potentialPosPiece == null || //empty space is valid
+                    potentialPosPiece.getTeamColor() != knight.getTeamColor()) { //enemy space is valid
+                        moves.add(new ChessMove(start, potentialPos, null));
+                    }
                 }    
-            }
+            }    
         }
         return moves;
     }
