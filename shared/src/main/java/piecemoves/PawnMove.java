@@ -53,16 +53,16 @@ public class PawnMove {
                 continue;
             }
 
-            ChessPosition potentialDiagonal = new ChessPosition(row, col);
+            ChessPosition potentialDiagonal = new ChessPosition(row + direction, col);
             ChessPiece diagonalPiece = board.getPiece(potentialDiagonal);
             if (diagonalPiece != null && diagonalPiece.getTeamColor() != color) {
                 if (promotion) {
                     for (ChessPiece.PieceType piece : promotionPieces) {
-                        moves.add(new ChessMove(start, potentialStraight, piece));
+                        moves.add(new ChessMove(start, potentialDiagonal, piece));
                     }    
                 }
                 else {
-                    moves.add(new ChessMove(start, potentialStraight, null));
+                    moves.add(new ChessMove(start, potentialDiagonal, null));
                 }
             }
         }
