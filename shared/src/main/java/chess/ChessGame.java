@@ -55,8 +55,48 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        ChessPiece movingPiece = currentBoard.getPiece(startPosition);
+        TeamColor teamColor = movingPiece.getTeamColor();
+        ChessPosition kingSpace;
+        ChessPiece king;
+        Collection<ChessMove> validMoves = movingPiece.pieceMoves(currentBoard, startPosition);
+        ChessBoard backupBoard = currentBoard;
 
-        throw new RuntimeException("Not implemented");
+        if (teamColor == TeamColor.WHITE) {
+                kingSpace = whiteKingSpace;
+                king = currentBoard.getPiece(kingSpace);
+            }
+            else {
+                kingSpace = blackKingSpace;
+                king = currentBoard.getPiece(kingSpace);
+            }
+
+        for (ChessMove move : validMoves) {
+            //change board and check for check
+            if (teamColor == TeamColor.WHITE && movingPiece == king) {
+                whiteKingSpace = move.getEndPosition();
+            }
+            else if(teamColor == TeamColor.BLACK && movingPiece == king) {
+                blackKingSpace = move.getEndPosition();
+            }
+
+            currentBoard.addPiece(move.getEndPosition(), movingPiece); 
+            currentBoard.addPiece(move.getEndPosition(), null); 
+
+            if (isInCheck(teamColor)) {
+                validMoves.remove(move); //remove invalid moves
+            }
+
+            //Reset board
+            if (teamColor == TeamColor.WHITE && movingPiece == king) {
+                whiteKingSpace = kingSpace;
+            }
+            else if(teamColor == TeamColor.BLACK && movingPiece == king) {
+                blackKingSpace = kingSpace;
+            }
+            currentBoard = backupBoard;
+        }
+        return validMoves;
     }
 
     /**
@@ -66,43 +106,24 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece movingPiece = currentBoard.getPiece(move.getStartPosition());
+        ChessPosition start = move.getStartPosition();
+        //check validity
+        if (!validMoves(start).contains(move)) {
+            return;
+        }
+
+        ChessPiece movingPiece = currentBoard.getPiece(start);
         TeamColor teamColor = movingPiece.getTeamColor();
-        ChessPosition kingSpace;
-        ChessPiece king;
-        Collection<ChessMove> validMoves = new ArrayList<>();
-        int row;
-        int col;
-
-        if (teamColor == TeamColor.WHITE) {
-            kingSpace = whiteKingSpace;
-            king = currentBoard.getPiece(kingSpace);
-
-            if(movingPiece == king) {
-                whiteKingSpace = move.getEndPosition();
-            }
+        
+        //update board state
+        if (teamColor == TeamColor.WHITE && movingPiece == currentBoard.getPiece(whiteKingSpace)) {
+            whiteKingSpace = move.getEndPosition();
         }
-        else {
-            kingSpace = blackKingSpace;
-            king = currentBoard.getPiece(kingSpace);
-
-            if(movingPiece == king) {
-                blackKingSpace = move.getEndPosition();
-            }
+        else if(teamColor == TeamColor.BLACK && movingPiece == currentBoard.getPiece(blackKingSpace)) {
+            blackKingSpace = move.getEndPosition();
         }
-
-        if (teamColor == TeamColor.WHITE) {
-            if(movingPiece == king) {
-                whiteKingSpace = kingSpace;
-            }
-        }
-        else {
-            if(movingPiece == king) {
-                blackKingSpace = move.getEndPosition();
-            }
-        }
-
-
+        currentBoard.addPiece(move.getEndPosition(), movingPiece);
+        currentBoard.addPiece(start, null);
     }
 
     /**
