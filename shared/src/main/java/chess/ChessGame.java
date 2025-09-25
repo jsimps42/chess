@@ -213,31 +213,22 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        ChessPosition kingSpace;
-        ChessPiece king;
-        Collection<ChessMove> potentialMoves = new ArrayList<>();
-        int row;
-        int col;
-        ChessPosition attackerPos;
-        ChessPiece attacker;
-        boolean checkmated = false;
-
-        if (teamColor == TeamColor.WHITE) {
-            kingSpace = whiteKingSpace;
-        }
-        else {
-            kingSpace = blackKingSpace;
+        if (!isInCheck(teamColor)) { 
+            return false; //No check, no mate
         }
 
-        king = currentBoard.getPiece(kingSpace);
-
-        potentialMoves = king.pieceMoves(currentBoard, kingSpace);
-
-        for (ChessMove move : potentialMoves) {
-
+        //run through each space
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = currentBoard.getPiece(position);
+                //Is this piece the same team? Can it make a move to get out of check?
+                if (piece.getTeamColor() == teamColor && !(validMoves(position).isEmpty())) {
+                    return false; //Can get out of check, then not checkmate
+                }
+            }
         }
-
-        return checkmated;
+        return true; //None of the pieces could stop the check? Checkmated
     }
 
     /**
@@ -248,7 +239,22 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) { //if in check, not stalemate
+            return false;
+        }
+
+        //run through each space
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = currentBoard.getPiece(position);
+                //Is this piece the same team? Can it make a valid move?
+                if (piece.getTeamColor() == teamColor && !(validMoves(position).isEmpty())) {
+                    return false; //Yes, then not stalemate
+                }
+            }
+        }
+        return true; //None of the pieces could move? Stalemate
     }
 
     /**
