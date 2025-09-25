@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.ArrayList;
 import piecemoves.*;
 
 /**
@@ -274,4 +273,46 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return currentBoard;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((teamTurn == null) ? 0 : teamTurn.hashCode());
+        result = prime * result + ((currentBoard == null) ? 0 : currentBoard.hashCode());
+        result = prime * result + ((whiteKingSpace == null) ? 0 : whiteKingSpace.hashCode());
+        result = prime * result + ((blackKingSpace == null) ? 0 : blackKingSpace.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ChessGame other = (ChessGame) obj;
+        if (teamTurn != other.teamTurn)
+            return false;
+        if (currentBoard == null) {
+            if (other.currentBoard != null)
+                return false;
+        } else if (!currentBoard.equals(other.currentBoard))
+            return false;
+        if (whiteKingSpace == null) {
+            if (other.whiteKingSpace != null)
+                return false;
+        } else if (!whiteKingSpace.equals(other.whiteKingSpace))
+            return false;
+        if (blackKingSpace == null) {
+            if (other.blackKingSpace != null)
+                return false;
+        } else if (!blackKingSpace.equals(other.blackKingSpace))
+            return false;
+        return true;
+    }
+
+    
 }
