@@ -52,7 +52,6 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece movingPiece = currentBoard.getPiece(startPosition);
-
         if (movingPiece == null) {
             return null;
         }
@@ -336,22 +335,26 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ChessGame other = (ChessGame) obj;
-        if (teamTurn != other.teamTurn)
+        if (teamTurn != other.teamTurn) {
             return false;
+        }
         if (currentBoard == null) {
-            if (other.currentBoard != null)
+            if (other.currentBoard != null) {
                 return false;
-        } else if (!currentBoard.equals(other.currentBoard))
+            }
+        } else if (!currentBoard.equals(other.currentBoard)) {
             return false;
+        }
         return true;
     }
-
-    
 }
