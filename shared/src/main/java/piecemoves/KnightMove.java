@@ -7,8 +7,13 @@ import java.lang.Math;
 
 public class KnightMove {
     public static Collection<ChessMove> getKnightMoves(ChessBoard board, ChessPosition start) {
-        Collection<ChessMove> moves = new ArrayList<>();
         ChessPiece knight = board.getPiece(start);
+
+        if (knight == null) {
+            return null;
+        }
+
+        Collection<ChessMove> moves = new ArrayList<>();
 
         for (int i = -2; i < 3; i++) { 
             if (i == 0) { //knight doesn't have possible moves in same row

@@ -6,9 +6,13 @@ import java.util.ArrayList;
 
 public class PawnMove {
     public static Collection<ChessMove> getPawnMoves(ChessBoard board, ChessPosition start) {
-        Collection<ChessMove> moves = new ArrayList<>();
         ChessPiece pawn = board.getPiece(start);
+        
+        if (pawn == null) {
+            return null;
+        }
 
+        Collection<ChessMove> moves = new ArrayList<>();
         ChessGame.TeamColor color = pawn.getTeamColor();
         int row = start.getRow();
         int col = start.getColumn();

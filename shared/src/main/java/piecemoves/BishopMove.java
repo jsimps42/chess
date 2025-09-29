@@ -6,8 +6,13 @@ import java.util.ArrayList;
 
 public class BishopMove {
     public static Collection<ChessMove> getBishopMoves(ChessBoard board, ChessPosition start) {
-        Collection<ChessMove> moves = new ArrayList<>();
         ChessPiece bishop = board.getPiece(start);
+
+        if (bishop == null) {
+            return null;
+        }
+
+        Collection<ChessMove> moves = new ArrayList<>();
         int[] posMovRow = {1, 1, -1, -1}; //The possible directions bishop can move 
         int[] posMovCol = {-1, 1, -1, 1}; //by row and column
 

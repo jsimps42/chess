@@ -6,8 +6,13 @@ import java.util.ArrayList;
 
 public class RookMove {
     public static Collection<ChessMove> getRookMoves(ChessBoard board, ChessPosition start) {
-        Collection<ChessMove> moves = new ArrayList<>();
         ChessPiece rook = board.getPiece(start);
+
+        if (rook == null) {
+            return null;
+        }
+        
+        Collection<ChessMove> moves = new ArrayList<>();
         int[] posMovRow = {0, 0, -1, 1}; //The possible directions rook can move 
         int[] posMovCol = {-1, 1, 0, 0}; //by row and column
 
