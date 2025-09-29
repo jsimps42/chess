@@ -241,24 +241,7 @@ public class ChessGame {
             return false; //No check, no mate
         }
 
-        //run through each space
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                ChessPosition position = new ChessPosition(i, j);
-                ChessPiece piece = currentBoard.getPiece(position);
-
-                //ignore non-pieces
-                if (piece == null) {
-                    continue;
-                }
-
-                //Is this piece the same team? Can it make a move to get out of check?
-                if (piece.getTeamColor() == teamColor && !(validMoves(position).isEmpty())) {
-                    return false; //Can get out of check, then not checkmate
-                }
-            }
-        }
-        return true; //None of the pieces could stop the check? Checkmated
+        return noValidMoves(teamColor);
     }
 
     /**
@@ -272,25 +255,7 @@ public class ChessGame {
         if (isInCheck(teamColor)) { //if in check, not stalemate
             return false;
         }
-
-        //run through each space
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                ChessPosition position = new ChessPosition(i, j);
-                ChessPiece piece = currentBoard.getPiece(position);
-
-                //Is piece valid?
-                if (piece == null) {
-                    continue;
-                }
-
-                //Is this piece the same team? Can it make a valid move?
-                if (piece.getTeamColor() == teamColor && !(validMoves(position).isEmpty())) {
-                    return false; //Yes, then not stalemate
-                }
-            }
-        }
-        return true; //None of the pieces could move? Stalemate
+        return noValidMoves(teamColor);
     }
 
     /**
@@ -323,6 +288,27 @@ public class ChessGame {
         }
     return null;
 }
+
+    private boolean noValidMoves(TeamColor teamColor) {
+        //run through each space
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = currentBoard.getPiece(position);
+
+                //Is piece valid?
+                if (piece == null) {
+                    continue;
+                }
+
+                //Is this piece the same team? Can it make a valid move?
+                if (piece.getTeamColor() == teamColor && !(validMoves(position).isEmpty())) {
+                    return false; //Yes, then valid moves remain
+                }
+            }
+        }
+        return true; //None of the pieces could move
+    }
 
     @Override
     public int hashCode() {
