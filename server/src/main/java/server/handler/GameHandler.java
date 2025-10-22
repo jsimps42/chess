@@ -15,8 +15,8 @@ public class GameHandler {
 
     public void createGame(Context context) {
         try {
-            var request = gson.fromJson(context.body(), GameData.class);
-            GameData game = gameService.createGame(request);
+            var request = gson.fromJson(context.body(), CreateGameRequest.class);
+            GameData game = gameService.createGame(request.gameName());
             context.status(200).json(game);
         } catch (Exception e) {
             context.status(500).json(new ErrorResponse("Error: " + e.getMessage()));
@@ -43,5 +43,6 @@ public class GameHandler {
         }
     }
 
+    record CreateGameRequest(String gameName) {}
     record ErrorResponse(String message) {}
 }

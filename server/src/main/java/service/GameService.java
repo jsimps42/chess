@@ -2,8 +2,6 @@ package service;
 
 import dataaccess.GameDAO;
 import model.GameData;
-import chess.ChessGame;
-
 import java.util.Collection;
 
 public class GameService {
@@ -13,11 +11,9 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public GameData createGame(GameData gameData) {
-        int id = gameDAO.createGame(gameData.gameName());
-        GameData game = new GameData(new ChessGame(), id, gameData.gameName(), null, null);
-        gameDAO.updateGame(id, game);
-        return game;
+    public GameData createGame(String gameName) {
+        int id = gameDAO.createGame(gameName);
+        return gameDAO.getGame(id);
     }
 
     public Collection<GameData> listGames() {
