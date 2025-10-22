@@ -3,7 +3,7 @@ package dataaccess;
 import model.AuthData;
 import java.util.HashMap;
 
-public class MemoryAuthDAO implements AuthDAO{
+public class MemoryAuthDAO implements AuthDAO {
 
     private final HashMap<String, AuthData> authTokens = new HashMap<>();
 
@@ -18,17 +18,17 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void deleteAuth(String authToken) {
+    public void removeAuth(String authToken) {
         authTokens.remove(authToken);
     }
 
-     @Override
+    @Override
     public void clear() {
         authTokens.clear();
     }
 
     @Override
-    public HashMap<String, AuthData> listAuthTokens(){
+    public HashMap<String, AuthData> listAuthTokens() {
         return authTokens;
     }
 }

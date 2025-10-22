@@ -5,49 +5,49 @@ import model.GameData;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class MemoryGameDAO implements GameDAO{
+public class MemoryGameDAO implements GameDAO {
 
     private final HashMap<Integer, GameData> games = new HashMap<>();
-    private int gameID = 1;
+    private int nextGameID = 1;
 
     @Override
-    public void clear(){
+    public void clear() {
         games.clear();
+        nextGameID = 1;
     }
 
     @Override
     public int createGame(String gameName) {
-        GameData game = new GameData(new ChessGame(), gameID, gameName, null, null);
-        gameID++;
-        games.put(gameID, game);
-        return gameID;
+        int currentID = nextGameID++;
+        GameData game = new GameData(new ChessGame(), currentID, gameName, null, null);
+        games.put(currentID, game);
+        return currentID;
     }
 
     @Override
-    public String getBlackUser(String gameID) {
-        GameData game = games.get(Integer.parseInt(gameID));
-        return game.blackUsername();
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
     }
 
     @Override
-    public String getWhiteUser(String gameId) {
-        GameData game = games.get(Integer.parseInt(gameId));
-        return game.whiteUsername();
+    public String getBlackUser(int gameID) {
+        GameData game = games.get(gameID);
+        return game != null ? game.blackUsername() : null;
     }
 
     @Override
-    public GameData getGame(String gameId) {
-        return games.get(Integer.parseInt(gameId));
+    public String getWhiteUser(int gameID) {
+        GameData game = games.get(gameID);
+        return game != null ? game.whiteUsername() : null;
+    }
+
+    @Override
+    public void updateGame(int gameID, GameData newGame) {
+        games.put(gameID, newGame);
     }
 
     @Override
     public Collection<GameData> listGames() {
         return games.values();
     }
-
-    @Override
-    public void updateGame(String gameId, GameData newGame) {
-        games.put(Integer.parseInt(gameId), newGame);
-    }
-
 }

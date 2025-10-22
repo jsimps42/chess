@@ -4,7 +4,8 @@ import model.UserData;
 import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAO {
-    private HashMap<String, UserData> users = new HashMap<>();
+
+    private final HashMap<String, UserData> users = new HashMap<>();
 
     @Override
     public void addUser(UserData user) throws DataAccessException {
@@ -25,7 +26,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public HashMap<String, UserData> getUserMap(){
+    public HashMap<String, UserData> getUserMap() {
         return users;
     }
 }
