@@ -11,8 +11,13 @@ public record AuthData(String authToken, String username) {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AuthData)) return false;
+        if (this == o) {
+            return true;
+        }    
+        if (!(o instanceof AuthData)) {
+            return false;
+        }
+        
         AuthData that = (AuthData) o;
         return Objects.equals(authToken(), that.authToken()) && 
         Objects.equals(username(), that.username());

@@ -30,7 +30,7 @@ public class UserService {
             }
             throw new BadRequestException(e.getMessage());
         }
-        String authToken = UUID.randomUUID().toString();
+        String authToken = AuthData.generateToken();
         AuthData authData = new AuthData(authToken, user.username());
         authAccess.addAuth(authData);
 
@@ -46,7 +46,7 @@ public class UserService {
         }
 
         if (userAuth) {
-            String authToken = UUID.randomUUID().toString();
+            String authToken = AuthData.generateToken();
             AuthData authData = new AuthData(authToken,userData.username());
             authAccess.addAuth(authData);
             return authData;

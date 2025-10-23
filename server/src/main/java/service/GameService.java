@@ -64,13 +64,13 @@ public class GameService {
 
         if (Objects.equals(color, "WHITE")) {
             if (whiteUser != null) {
-                return false; // Spot taken
+                return false;
             } else {
                 whiteUser = authData.username();
             }
         } else if (Objects.equals(color, "BLACK")) {
             if (blackUser != null) {
-                return false; // Spot taken
+                return false;
             } else {
                 blackUser = authData.username();
             }
