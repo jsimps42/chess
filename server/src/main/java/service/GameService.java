@@ -12,9 +12,14 @@ public class GameService {
     }
 
     public GameData createGame(String gameName) {
+        if (gameName == null || gameName.isBlank()) {
+            return null;
+        }
+        
         int id = gameDAO.createGame(gameName);
         return gameDAO.getGame(id);
-    }
+    }  
+
 
     public Collection<GameData> listGames() {
         return gameDAO.listGames();
@@ -41,4 +46,13 @@ public class GameService {
         gameDAO.updateGame(gameID, updatedGame);
         return updatedGame;
     }
+
+    public GameData getGame(int id) {
+        return gameDAO.getGame(id);
+    }
+
+    public void updateGame(GameData game) {
+        gameDAO.updateGame(game.gameID(), game);
+    }
+
 }
