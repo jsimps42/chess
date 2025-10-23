@@ -62,6 +62,15 @@ public class GameServiceTest {
     }
 
     @Test
+    @DisplayName("Join Game with Invalid Color Throws BadRequestException")
+    void joinGameInvalidColor() throws Exception {
+        int gameID = gameService.createGame(existingAuthToken, "Game");
+        assertThrows(BadRequestException.class, () -> 
+            gameService.joinGame(existingAuthToken, gameID, "RED"));
+    }
+
+
+    @Test
     @DisplayName("Join Game Unauthorized")
     void joinGameUnauthorized() throws Exception {
         int gameID = gameService.createGame(existingAuthToken, "Game");
@@ -87,5 +96,13 @@ public class GameServiceTest {
 
         boolean success = gameService.joinGame(auth2.authToken(), gameID, "WHITE");
         assertFalse(success);
+    }
+
+    @Test
+    @DisplayName("GameService clear clears all games and auths")
+    void gameServiceClear() throws Exception {
+        gameService.createGame(existingAuthToken, "GameName");
+        gameService.clear();
+        assertThrows(UnauthorizedException.class, () -> gameService.listGames(existingAuthToken));
     }
 }
