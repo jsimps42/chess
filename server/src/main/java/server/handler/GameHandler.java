@@ -16,8 +16,19 @@ public class GameHandler {
     public void createGame(Context context) {
         try {
             var request = gson.fromJson(context.body(), CreateGameRequest.class);
+            if (request == null || request.gameName() == null || request.gameName().isBlank()) {
+                context.status(400).json(new ErrorResponse("Error: bad request"));
+                return;
+            }
+
             GameData game = gameService.createGame(request.gameName());
-            context.status(200).json(game);
+            if (game == null) {
+                context.status(500).json(new ErrorResponse("Error: could not create game"));
+                return;
+            }
+
+            context.status(200).json(new CreateGameResponse(game.gameID()));
+
         } catch (Exception e) {
             context.status(500).json(new ErrorResponse("Error: " + e.getMessage()));
         }
@@ -45,4 +56,5 @@ public class GameHandler {
 
     record CreateGameRequest(String gameName) {}
     record ErrorResponse(String message) {}
+    record CreateGameResponse(int gameID) {}
 }

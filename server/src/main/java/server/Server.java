@@ -11,7 +11,6 @@ import service.*;
 public class Server {
     private final Javalin app;
     private final Gson gson = new Gson();
-
     private final UserService userService;
     private final SessionService sessionService;
     private final GameService gameService;
@@ -40,6 +39,7 @@ public class Server {
 
     public void stop() {
         app.stop();
+        return;
     }
 
     private void registerRoutes() {
@@ -47,6 +47,7 @@ public class Server {
         app.delete("/db", ctx -> {
             clearService.clear();
             ctx.status(200);
+            return;
         });
 
         // --- REGISTER USER ---
@@ -58,6 +59,7 @@ public class Server {
             } catch (Exception e) {
                 sendError(ctx, e.getMessage());
             }
+            return;
         });
 
         // --- LOGIN ---
@@ -69,6 +71,7 @@ public class Server {
             } catch (Exception e) {
                 sendError(ctx, e.getMessage());
             }
+            return;
         });
 
         // --- LOGOUT ---
@@ -80,31 +83,39 @@ public class Server {
             }
             authDAO.removeAuth(token);
             ctx.status(200);
+            return;
         });
 
         // --- CREATE GAME ---
         app.post("/game", ctx -> {
-            var token = extractAuth(ctx);
-            if (token == null || authDAO.getAuth(token) == null) {
+            String authHeader = ctx.header("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 ctx.status(401).json(new ErrorResponse("Error: unauthorized"));
                 return;
             }
 
-            var req = gson.fromJson(ctx.body(), CreateGameRequest.class);
-            if (req == null || req.gameName() == null || req.gameName().isBlank()) {
-                ctx.status(400).json(new ErrorResponse("Error: bad request"));
-                return;
-            }
-
-            var game = gameService.createGame(req.gameName());
-            if (game == null) {
-                ctx.status(500).json(new ErrorResponse("Error: could not create game"));
-                return;
+        String token = authHeader.substring(7);
+        if (authDAO.getAuth(token) == null) {
+            ctx.status(401).json(new ErrorResponse("Error: unauthorized"));
+            return;
         }
 
-            ctx.status(200).json(new CreateGameResponse(game.gameID()));
-        });
+        CreateGameRequest req = gson.fromJson(ctx.body(), CreateGameRequest.class);
+        if (req == null || req.gameName() == null || req.gameName().isBlank()) {
+            ctx.status(400).json(new ErrorResponse("Error: bad request"));
+            return;
+        }
 
+        GameData game = gameService.createGame(req.gameName());
+        if (game == null) {
+            ctx.status(500).json(new ErrorResponse("Error: could not create game"));
+            return;
+        }
+
+            System.out.println("Creating game, ID = " + game.gameID());
+            ctx.status(200).json(new CreateGameResponse(game.gameID()));
+            return;
+        });
 
         // --- LIST GAMES ---
         app.get("/game", ctx -> {
@@ -116,6 +127,7 @@ public class Server {
 
             var games = gameService.listGames().toArray(new GameData[0]);
             ctx.status(200).json(new ListGamesResponse(games));
+            return;
         });
 
         // --- JOIN GAME ---
@@ -149,6 +161,7 @@ public class Server {
 
             gameService.updateGame(updated);
             ctx.status(200);
+            return;
         });
     }
 
