@@ -85,5 +85,6 @@ public class GameService {
 
     public void clear() {
         gameAccess.clear();
+        authAccess.clear();
     }
 }

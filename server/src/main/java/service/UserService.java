@@ -1,6 +1,5 @@
 package service;
 
-import java.util.UUID;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
