@@ -2,13 +2,12 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>edu.byu.cs240</groupId>
     <artifactId>shared</artifactId>
     <version>1.0.0</version>
 
     <parent>
-        <groupId>edu.byu.cs240</groupId>
         <artifactId>chess</artifactId>
+        <groupId>edu.byu.cs240</groupId>
         <version>1.0.0</version>
     </parent>
 
@@ -17,15 +16,6 @@
     <build>
         <finalName>shared</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -53,7 +43,9 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>Main</mainClass>
+                                    <mainClass>
+                                        Main
+                                    </mainClass>
                                 </manifest>
                             </archive>
                             <descriptors>
@@ -63,17 +55,7 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
 </project>
