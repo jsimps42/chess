@@ -1,33 +1,72 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.UserDAO;
+import java.util.UUID;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
 public class UserService {
-    private final UserDAO userDAO;
-    private final AuthDAO authDAO;
+    UserAccess userAccess;
+    AuthAccess authAccess;
 
-    public UserService(UserDAO userDAO, AuthDAO authDAO) {
-        this.userDAO = userDAO;
-        this.authDAO = authDAO;
+    public UserService(UserAccess userAccess, AuthAccess authAccess) {
+        this.userAccess = userAccess;
+        this.authAccess = authAccess;
     }
 
-    public AuthData register(UserData user) throws Exception {
-        if (user.username() == null || user.password() == null || user.email() == null) {
-            throw new Exception("bad request");
+    public AuthData register(UserData user) throws BadRequestException, ForbiddenException {
+        if (user == null ||
+            user.username() == null || user.username().isEmpty() ||
+            user.password() == null || user.password().isEmpty() ||
+            user.email() == null || user.email().isEmpty()) {
+            throw new BadRequestException("Missing required registration fields");
         }
 
-        if (userDAO.getUser(user.username()) != null) {
-            throw new Exception("already taken");
+        try {
+            userAccess.addUser(user);
+        } catch (DataAccessException e) {
+            if (e.getMessage().contains("already exists")) {
+                throw new ForbiddenException("User already registered");
+            }
+            throw new BadRequestException(e.getMessage());
+        }
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, user.username());
+        authAccess.addAuth(authData);
+
+        return authData;
+    }
+
+    public AuthData loginUser(UserData userData) throws UnauthorizedException {
+        boolean userAuth = false;
+        try {
+            userAuth = userAccess.authenticateUser(userData.username(), userData.password());
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
         }
 
-        userDAO.addUser(user);
+        if (userAuth) {
+            String authToken = UUID.randomUUID().toString();
+            AuthData authData = new AuthData(authToken,userData.username());
+            authAccess.addAuth(authData);
+            return authData;
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
 
-        String token = AuthData.generateToken();
-        AuthData auth = new AuthData(token, user.username());
-        authDAO.addAuth(auth);
-        return auth;
+
+    public void logoutUser(String authToken) throws UnauthorizedException {
+        try {
+            authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
+        }
+        authAccess.deleteAuth(authToken);
+    }
+
+    public void clear() {
+        userAccess.clear();
+        authAccess.clear();
     }
 }

@@ -1,58 +1,89 @@
 package service;
 
-import dataaccess.GameDAO;
-import model.GameData;
-import java.util.Collection;
+import dataaccess.*;
+import model.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Random;
 
 public class GameService {
-    private final GameDAO gameDAO;
+    GameAccess gameAccess;
+    AuthAccess authAccess;
 
-    public GameService(GameDAO gameDAO) {
-        this.gameDAO = gameDAO;
+    public GameService(GameAccess gameAccess, AuthAccess authAccess) {
+        this.gameAccess = gameAccess;
+        this.authAccess = authAccess;
     }
 
-    public GameData createGame(String gameName) {
-        if (gameName == null || gameName.isBlank()) {
-            return null;
+    public HashSet<GameData> listGames(String authToken) throws UnauthorizedException {
+        try {
+            authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
         }
-        
-        int id = gameDAO.createGame(gameName);
-        return gameDAO.getGame(id);
-    }  
-
-
-    public Collection<GameData> listGames() {
-        return gameDAO.listGames();
+        return gameAccess.listGames();
     }
 
-    public GameData joinGame(int gameID, String username) throws Exception {
-        GameData game = gameDAO.getGame(gameID);
-        if (game == null) {
-            throw new Exception("game not found");
+    public int createGame(String authToken, String gameName) throws UnauthorizedException {
+        try {
+            authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
         }
 
-        String whiteUser = game.whiteUsername();
-        String blackUser = game.blackUsername();
+        Random rand = new Random();
+        int gameID;
+        do {
+            gameID = rand.nextInt(9999) + 1;
+        } while (gameAccess.gameExists(gameID));
 
-        if (whiteUser == null) {
-            whiteUser = username;
-        } else if (blackUser == null && !username.equals(whiteUser)) {
-            blackUser = username;
+        gameAccess.createGame(new GameData(null, gameID, gameName, null, null));
+
+        return gameID;
+    }
+
+    public boolean joinGame(String authToken, int gameID, String color) throws UnauthorizedException, BadRequestException {
+
+        AuthData authData;
+        GameData gameData;
+
+        try {
+            authData = authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
+        }
+
+        try {
+            gameData = gameAccess.getGame(gameID);
+        } catch (DataAccessException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+
+        String whiteUser = gameData.whiteUsername();
+        String blackUser = gameData.blackUsername();
+
+        if (Objects.equals(color, "WHITE")) {
+            if (whiteUser != null) {
+                return false; // Spot taken
+            } else {
+                whiteUser = authData.username();
+            }
+        } else if (Objects.equals(color, "BLACK")) {
+            if (blackUser != null) {
+                return false; // Spot taken
+            } else {
+                blackUser = authData.username();
+            }
+        } else if (color == null || color.isEmpty()) {
+            throw new BadRequestException("Error: Player color cannot be null or empty");
         } else {
-            throw new Exception("game full or user already joined");
+            throw new BadRequestException("%s is not a valid team color".formatted(color));
         }
-
-        GameData updatedGame = new GameData(game.game(), game.gameID(), game.gameName(), whiteUser, blackUser);
-        gameDAO.updateGame(gameID, updatedGame);
-        return updatedGame;
+        gameAccess.updateGame(new GameData(gameData.game(), gameID, gameData.gameName(), whiteUser, blackUser));
+        return true;
     }
 
-    public GameData getGame(int id) {
-        return gameDAO.getGame(id);
+    public void clear() {
+        gameAccess.clear();
     }
-
-    public void updateGame(GameData game) {
-        gameDAO.updateGame(game.gameID(), game);
-    }
-
 }
