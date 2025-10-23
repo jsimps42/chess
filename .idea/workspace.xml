@@ -5,11 +5,89 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="da651269-3b4b-4f19-90ef-949d0fa95781" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessBoard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessMove.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessMove.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPiece.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPiece.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPosition.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPosition.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/piecemoves/BishopMove.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/piecemoves/BishopMove.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/google_code_gson.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/google_code_gson.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/io_javalin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/io_javalin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/junit_jupiter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/junit_jupiter.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/lib.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/lib.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/slf4j_simple.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/slf4j_simple.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_22_2025_7_17_PM_[Changes]/shelved.patch" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_22_2025_7_17_PM_[Changes]/shelved.patch" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_22_2025_7_17_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_22_2025_7_17_PM__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/client.iml" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/bin/.project" beforeDir="false" afterPath="$PROJECT_DIR$/server/bin/.project" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/bin/.settings/org.eclipse.core.resources.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/server/bin/.settings/org.eclipse.core.resources.prefs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/bin/.settings/org.eclipse.m2e.core.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/server/bin/.settings/org.eclipse.m2e.core.prefs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/bin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/bin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/bin/server.iml" beforeDir="false" afterPath="$PROJECT_DIR$/server/bin/server.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/bin/src/main/resources/web/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/server/bin/src/main/resources/web/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/bin/src/main/resources/web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/server/bin/src/main/resources/web/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/bin/src/main/resources/web/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/bin/src/main/resources/web/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/server.iml" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Test/Java/passoff/model/TestCreateResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Test/Java/passoff/model/TestCreateResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Test/Java/service/GameServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Test/Java/service/GameServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/Test/Java/service/UserServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/Test/Java/service/UserServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/AuthAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/AuthAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/BadRequestException.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/BadRequestException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/DataAccessException.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/DataAccessException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/ForbiddenException.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/ForbiddenException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/GameAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/GameAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryAuthAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryAuthAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryGameAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryGameAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryUserAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryUserAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/UnauthorizedException.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/UnauthorizedException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/UserAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/UserAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/handler/GameHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handler/GameHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/handler/UserHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handler/UserHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/service/GameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/service/GameService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/resources/web/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/resources/web/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/resources/web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/resources/web/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/resources/web/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/resources/web/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/shared/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/shared.iml" beforeDir="false" afterPath="$PROJECT_DIR$/shared/shared.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/model/AuthData.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/model/AuthData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/model/request/CreateGameRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/model/request/CreateGameRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/model/request/RegisterRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/model/request/RegisterRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/extracredit/CastlingTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/extracredit/CastlingTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/extracredit/EnPassantTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/extracredit/EnPassantTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/ChessGameTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/ChessGameTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/FullGameTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/FullGameTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/GameStatusTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/GameStatusTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/MakeMoveTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/MakeMoveTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/ValidMovesTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/1-chess-game/passoff/chess/game/ValidMovesTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/3-web-api/dataaccess/DataAccessException.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/3-web-api/dataaccess/DataAccessException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/3-web-api/passoff/server/StandardAPITests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/3-web-api/passoff/server/StandardAPITests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/3-web-api/resources/web/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/3-web-api/resources/web/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/3-web-api/resources/web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/3-web-api/resources/web/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/3-web-api/resources/web/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/3-web-api/resources/web/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/3-web-api/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/3-web-api/server/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/4-database/dataaccess/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/4-database/dataaccess/DatabaseManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/4-database/passoff/server/DatabaseTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/4-database/passoff/server/DatabaseTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/4-database/resources/db.properties" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/4-database/resources/db.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/5-pregame/client/ServerFacadeTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/5-pregame/client/ServerFacadeTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/5-pregame/ui/EscapeSequences.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/5-pregame/ui/EscapeSequences.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/6-gameplay/passoff/server/TestFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/6-gameplay/passoff/server/TestFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/6-gameplay/passoff/server/WebSocketTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/6-gameplay/passoff/server/WebSocketTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/6-gameplay/websocket/commands/UserGameCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/6-gameplay/websocket/commands/UserGameCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/starter-code/6-gameplay/websocket/messages/ServerMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/6-gameplay/websocket/messages/ServerMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test-dependencies-assembly.xml" beforeDir="false" afterPath="$PROJECT_DIR$/test-dependencies-assembly.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,6 +97,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "jsimps42"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/jsimps42/chess.git",
+    "accountId": "9d0358c0-bc7c-46e0-905e-6792f2107349"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -29,6 +119,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JUnit.All in server.executor": "Run",
     "JUnit.BishopMoveTests.bishopBlocked.executor": "Run",
     "JUnit.BishopMoveTests.bishopCaptureEnemy.executor": "Run",
     "JUnit.BishopMoveTests.bishopMoveUntilEdge.executor": "Run",
@@ -40,7 +131,15 @@
     "last_opened_file_path": "C:/Users/Jake/OneDrive/Documents/GitHub/chess"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.BishopMoveTests.bishopBlocked">
+  <component name="RunManager" selected="JUnit.test in server">
+    <configuration name="All in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="BishopMoveTests.bishopBlocked" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="shared" />
       <extension name="coverage">
@@ -89,8 +188,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="test in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/server/src/test" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.test in server" />
+        <item itemvalue="JUnit.All in server" />
         <item itemvalue="JUnit.BishopMoveTests.bishopBlocked" />
         <item itemvalue="JUnit.BishopMoveTests.bishopCaptureEnemy" />
         <item itemvalue="JUnit.BishopMoveTests.bishopMoveUntilEdge" />
