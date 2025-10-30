@@ -12,12 +12,12 @@ public class UserService {
         this.authAccess = authAccess;
     }
 
-    public AuthData register(UserData user)
-            throws BadRequestException, ForbiddenException, DataAccessException {
-        if (user == null || user.username() == null || user.username().isBlank()
-                || user.password() == null || user.password().isBlank()
-                || user.email() == null || user.email().isBlank()) {
-            throw new BadRequestException("bad request");
+    public AuthData register(UserData user) throws BadRequestException, ForbiddenException, DataAccessException {
+        if (user == null ||
+            user.username() == null || user.username().isEmpty() ||
+            user.password() == null || user.password().isEmpty() ||
+            user.email() == null || user.email().isEmpty()) {
+            throw new BadRequestException("Missing required registration fields");
         }
         if (userAccess.getUser(user.username()) != null) {
             throw new ForbiddenException("already taken");
@@ -29,23 +29,35 @@ public class UserService {
         return auth;
     }
 
-    public AuthData loginUser(UserData userData) throws DataAccessException {
-        userAccess.authenticateUser(userData.username(), userData.password());
-        String token = AuthData.generateToken();
-        AuthData auth = new AuthData(token, userData.username());
-        authAccess.addAuth(auth);
-        return auth;
+    public AuthData loginUser(UserData userData) throws UnauthorizedException, DataAccessException {
+        boolean userAuth = false;
+        try {
+            userAuth = userAccess.authenticateUser(userData.username(), userData.password());
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
+        }
+
+        if (userAuth) {
+            String authToken = AuthData.generateToken();
+            AuthData authData = new AuthData(authToken,userData.username());
+            authAccess.addAuth(authData);
+            return authData;
+        } else {
+            throw new UnauthorizedException();
+        }
     }
 
-    public void logoutUser(String authToken)
-            throws UnauthorizedException, DataAccessException {
-        if (authAccess.getAuth(authToken) == null) {
-            throw new UnauthorizedException("bad auth");
+
+    public void logoutUser(String authToken) throws UnauthorizedException, DataAccessException{
+        try {
+            authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
         }
         authAccess.deleteAuth(authToken);
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException{
         userAccess.clear();
         authAccess.clear();
     }

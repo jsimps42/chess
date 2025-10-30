@@ -20,25 +20,23 @@ public class Server {
 
     private Javalin server;
 
-    public Server() {
+    public Server() throws DataAccessException{
         try {
-            DatabaseManager.loadPropertiesFromResources();
-
             DatabaseManager.createDatabase();
             DatabaseManager.createTables();
-
-            userAccess = new MySQLUserAccess();
-            authAccess = new MySQLAuthAccess();
-            gameAccess = new MySQLGameAccess();
-            userService = new UserService(userAccess, authAccess);
-            gameService = new GameService(gameAccess, authAccess);
-            userHandler = new UserHandler(userService);
-            gameHandler = new GameHandler(gameService);
+            System.out.println("Database and tables verified/created.");
         } catch (DataAccessException e) {
-            throw new RuntimeException("Database initialization failed", e);
-        } catch (Exception e) {
-            throw new RuntimeException("Server startup failed", e);
+            System.err.println("Failed to initialize database: " + e.getMessage());
+            e.printStackTrace();
         }
+
+        userAccess = new MySQLUserAccess();
+        authAccess = new MySQLAuthAccess();
+        gameAccess = new MySQLGameAccess();
+        userService = new UserService(userAccess, authAccess);
+        gameService = new GameService(gameAccess, authAccess);
+        userHandler = new UserHandler(userService);
+        gameHandler = new GameHandler(gameService);
     }
 
     public int run(int desiredPort) {

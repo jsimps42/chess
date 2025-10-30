@@ -14,19 +14,20 @@ public class GameService {
         this.authAccess = authAccess;
     }
 
-    private AuthData checkAuth(String authToken) throws UnauthorizedException, DataAccessException {
-        AuthData auth = authAccess.getAuth(authToken);
-        if (auth == null) {
-            throw new UnauthorizedException("bad auth");
+    public HashSet<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
+        try {
+            authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
         }
         return auth;
     }
 
-    public int createGame(String authToken, String gameName)
-            throws UnauthorizedException, BadRequestException, DataAccessException {
-        checkAuth(authToken);
-        if (gameName == null || gameName.isBlank()) {
-            throw new BadRequestException("bad request");
+    public int createGame(String authToken, String gameName) throws UnauthorizedException, DataAccessException {
+        try {
+            authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
         }
         GameData g = new GameData(new ChessGame(), 0, gameName, null, null);
         return gameAccess.createGame(g);
@@ -38,13 +39,21 @@ public class GameService {
         return new HashSet<>(gameAccess.listGames());
     }
 
-    public boolean joinGame(String authToken, int gameID, ChessGame.TeamColor playerColor)
-            throws UnauthorizedException, BadRequestException, DataAccessException {
-        authAccess.getAuth(authToken);
-        AuthData auth = checkAuth(authToken);
-        GameData game = gameAccess.getGame(gameID);
-        if (game == null) {
-            throw new BadRequestException("Game not found");
+    public boolean joinGame(String authToken, int gameID, String color) throws UnauthorizedException, BadRequestException, DataAccessException {
+
+        AuthData authData;
+        GameData gameData;
+
+        try {
+            authData = authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException();
+        }
+
+        try {
+            gameData = gameAccess.getGame(gameID);
+        } catch (DataAccessException e) {
+            throw new BadRequestException(e.getMessage());
         }
         
         String white = game.whiteUsername();
@@ -70,6 +79,7 @@ public class GameService {
         return true;
     }
 
+    public void clear() throws DataAccessException {
     public void clear() throws DataAccessException {
         gameAccess.clear();
         authAccess.clear();
