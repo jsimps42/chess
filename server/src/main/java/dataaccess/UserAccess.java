@@ -6,5 +6,5 @@ public interface UserAccess {
     void addUser(UserData username) throws DataAccessException;
     UserData getUser(String username) throws DataAccessException;
     boolean authenticateUser(String username, String password) throws DataAccessException;
-    void clear();
+    void clear() throws DataAccessException;
 }

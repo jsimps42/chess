@@ -14,7 +14,7 @@ public class GameServiceTests {
     String existingAuthToken;
 
     @BeforeEach
-    void setup() {
+    void setup() throws DataAccessException{
         gameAccess = new MemoryGameAccess();
         authAccess = new MemoryAuthAccess();
         gameService = new GameService(gameAccess, authAccess);

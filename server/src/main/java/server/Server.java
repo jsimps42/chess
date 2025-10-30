@@ -19,10 +19,19 @@ public class Server {
 
     private Javalin server;
 
-    public Server() {
-        userAccess = new MemoryUserAccess();
-        authAccess = new MemoryAuthAccess();
-        gameAccess = new MemoryGameAccess();
+    public Server() throws DataAccessException{
+        try {
+            DatabaseManager.createDatabase();
+            DatabaseManager.createTables();
+            System.out.println("Database and tables verified/created.");
+        } catch (DataAccessException e) {
+            System.err.println("Failed to initialize database: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        userAccess = new MySQLUserAccess();
+        authAccess = new MySQLAuthAccess();
+        gameAccess = new MySQLGameAccess();
         userService = new UserService(userAccess, authAccess);
         gameService = new GameService(gameAccess, authAccess);
         userHandler = new UserHandler(userService);

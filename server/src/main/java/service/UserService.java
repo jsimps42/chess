@@ -13,7 +13,7 @@ public class UserService {
         this.authAccess = authAccess;
     }
 
-    public AuthData register(UserData user) throws BadRequestException, ForbiddenException {
+    public AuthData register(UserData user) throws BadRequestException, ForbiddenException, DataAccessException {
         if (user == null ||
             user.username() == null || user.username().isEmpty() ||
             user.password() == null || user.password().isEmpty() ||
@@ -36,7 +36,7 @@ public class UserService {
         return authData;
     }
 
-    public AuthData loginUser(UserData userData) throws UnauthorizedException {
+    public AuthData loginUser(UserData userData) throws UnauthorizedException, DataAccessException {
         boolean userAuth = false;
         try {
             userAuth = userAccess.authenticateUser(userData.username(), userData.password());
@@ -55,7 +55,7 @@ public class UserService {
     }
 
 
-    public void logoutUser(String authToken) throws UnauthorizedException {
+    public void logoutUser(String authToken) throws UnauthorizedException, DataAccessException{
         try {
             authAccess.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -64,7 +64,7 @@ public class UserService {
         authAccess.deleteAuth(authToken);
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException{
         userAccess.clear();
         authAccess.clear();
     }

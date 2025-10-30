@@ -15,7 +15,7 @@ public class GameService {
         this.authAccess = authAccess;
     }
 
-    public HashSet<GameData> listGames(String authToken) throws UnauthorizedException {
+    public HashSet<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
         try {
             authAccess.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -24,7 +24,7 @@ public class GameService {
         return gameAccess.listGames();
     }
 
-    public int createGame(String authToken, String gameName) throws UnauthorizedException {
+    public int createGame(String authToken, String gameName) throws UnauthorizedException, DataAccessException {
         try {
             authAccess.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -42,7 +42,7 @@ public class GameService {
         return gameID;
     }
 
-    public boolean joinGame(String authToken, int gameID, String color) throws UnauthorizedException, BadRequestException {
+    public boolean joinGame(String authToken, int gameID, String color) throws UnauthorizedException, BadRequestException, DataAccessException {
 
         AuthData authData;
         GameData gameData;
@@ -83,7 +83,7 @@ public class GameService {
         return true;
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         gameAccess.clear();
         authAccess.clear();
     }

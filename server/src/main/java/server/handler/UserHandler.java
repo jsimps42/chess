@@ -8,6 +8,7 @@ import com.google.gson.JsonSyntaxException;
 import dataaccess.BadRequestException;
 import dataaccess.UnauthorizedException;
 import dataaccess.ForbiddenException;
+import dataaccess.DataAccessException;
 
 public class UserHandler {
     UserService userService;

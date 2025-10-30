@@ -9,6 +9,7 @@ import java.util.Map;
 import model.GameData;
 import dataaccess.BadRequestException;
 import dataaccess.UnauthorizedException;
+import dataaccess.DataAccessException;
 
 public class GameHandler {
 
