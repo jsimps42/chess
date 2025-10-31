@@ -1,121 +1,123 @@
 package dataaccess;
 
+import java.io.PrintWriter;
 import java.sql.*;
 import java.util.Properties;
 
 public class DatabaseManager {
+    private static boolean tablesCreated = false;
+    private static final Object lock = new Object();
     private static String databaseName;
     private static String dbUsername;
     private static String dbPassword;
     private static String connectionUrl;
 
-    /*
-     * Load the database information for the db.properties file.
-     */
-    static {
-        loadPropertiesFromResources();
-    }
-
-    /**
-     * Creates the database if it does not already exist.
-     */
-    static public void createDatabase() throws DataAccessException {
+    public static void createDatabase() throws DataAccessException {
         var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
         try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
              var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            System.err.println("Error while creating the database: " + ex.getMessage());
             throw new DataAccessException("failed to create database", ex);
         }
     }
 
     public static void createTables() throws DataAccessException {
-        try (var conn = getConnection()) {
-
-            try (var stmt = conn.createStatement()) {
-                stmt.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS user (
-                        username VARCHAR(255) NOT NULL PRIMARY KEY,
-                        password VARCHAR(255) NOT NULL,
-                        email VARCHAR(255)
-                    )
-                """);
-
-                stmt.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS auth (
-                        authToken VARCHAR(255) NOT NULL PRIMARY KEY,
-                        username VARCHAR(255) NOT NULL,
-                        FOREIGN KEY (username) REFERENCES user(username)
-                            ON DELETE CASCADE
-                    )
-                """);
-
-                stmt.executeUpdate("DROP TABLE IF EXISTS game");
-                stmt.executeUpdate("""
-                    CREATE TABLE game (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        game_state TEXT NOT NULL,
-                        name VARCHAR(255) NOT NULL,
-                        white_username VARCHAR(255),
-                        black_username VARCHAR(255),
-                        FOREIGN KEY (white_username) REFERENCES user(username) ON DELETE SET NULL,
-                        FOREIGN KEY (black_username) REFERENCES user(username) ON DELETE SET NULL
-                    )
-                """);
-            }
-
-        } catch (SQLException ex) {
-           ex.printStackTrace();
-            throw new DataAccessException("failed to create tables", ex);
+    synchronized (lock) {
+        if (tablesCreated) {
+            System.out.println("[DB] Tables already created – skipping");
+            return;
         }
+
+        try (var conn = getConnection();
+             var stmt = conn.createStatement()) {
+
+            stmt.executeUpdate("""
+                CREATE TABLE IF NOT EXISTS user (
+                    username VARCHAR(255) NOT NULL PRIMARY KEY,
+                    password VARCHAR(255) NOT NULL,
+                    email VARCHAR(255)
+                )
+            """);
+
+            stmt.executeUpdate("""
+                CREATE TABLE IF NOT EXISTS auth (
+                    authToken VARCHAR(255) NOT NULL PRIMARY KEY,
+                    username VARCHAR(255) NOT NULL
+                )
+            """);
+
+            stmt.executeUpdate("""
+                CREATE TABLE IF NOT EXISTS game (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    game_state TEXT NOT NULL,
+                    name VARCHAR(255) NOT NULL,
+                    white_username VARCHAR(255),
+                    black_username VARCHAR(255)
+                )
+            """);
+
+            stmt.executeUpdate("""
+                ALTER TABLE auth
+                ADD CONSTRAINT fk_auth_user
+                FOREIGN KEY (username) REFERENCES user(username) ON DELETE CASCADE
+            """);
+
+            stmt.executeUpdate("""
+                ALTER TABLE game
+                ADD CONSTRAINT fk_game_white
+                FOREIGN KEY (white_username) REFERENCES user(username) ON DELETE SET NULL
+            """);
+
+            stmt.executeUpdate("""
+                ALTER TABLE game
+                ADD CONSTRAINT fk_game_black
+                FOREIGN KEY (black_username) REFERENCES user(username) ON DELETE SET NULL
+            """);
+
+        } catch (SQLException e) {
+            String msg = e.getMessage().toLowerCase();
+            if (!msg.contains("duplicate") && !msg.contains("already exists")) {
+                throw new DataAccessException("Failed to create tables: " + e.getMessage(), e);
+            }
+            // else: ignore duplicate constraint
+        } finally {
+            tablesCreated = true;  // Always set
+        }
+
+        System.out.println("[DB] Tables and constraints created (idempotent)");
     }
+}
 
-
-    /**
-     * Create a connection to the database and sets the catalog based upon the
-     * properties specified in db.properties. Connections to the database should
-     * be short-lived, and you must close the connection when you are done with it.
-     * The easiest way to do that is with a try-with-resource block.
-     * <br/>
-     * <code>
-     * try (var conn = DatabaseManager.getConnection()) {
-     * // execute SQL statements.
-     * }
-     * </code>
-     */
-    static Connection getConnection() throws DataAccessException {
+    public static Connection getConnection() throws DataAccessException {
         try {
-            //do not wrap the following line with a try-with-resources
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
             conn.setCatalog(databaseName);
+            DriverManager.setLogWriter(new PrintWriter(System.out));
             return conn;
         } catch (SQLException ex) {
-            ex.printStackTrace();
             throw new DataAccessException("failed to get connection", ex);
         }
     }
 
-    private static void loadPropertiesFromResources() {
-        try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
+    public static void loadPropertiesFromResources() {
+        try (var propStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("db.properties")) {
             if (propStream == null) {
-                throw new Exception("Unable to load db.properties");
+                throw new RuntimeException("db.properties not found");
             }
             Properties props = new Properties();
             props.load(propStream);
             loadProperties(props);
         } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("unable to process db.properties", ex);
+            throw new RuntimeException("Failed to load db.properties", ex);
         }
     }
 
-    private static void loadProperties(Properties props) {
+    public static void loadProperties(Properties props) {
         databaseName = props.getProperty("db.name");
-        dbUsername = props.getProperty("db.user");
-        dbPassword = props.getProperty("db.password");
-
+        dbUsername   = props.getProperty("db.user");
+        dbPassword   = props.getProperty("db.password");
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);

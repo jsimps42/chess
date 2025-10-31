@@ -19,69 +19,95 @@ public class GameHandler {
         this.gameService = gameService;
     }
 
+    // HELPER: Extract auth token robustly
+    private String getAuthToken(Context ctx) {
+        String token = ctx.header("authorization");
+        if (token == null) token = ctx.header("Authorization");
+        if (token == null) token = ctx.header("AUTHORIZATION");
+        
+        if (token != null) {
+            token = token.trim();
+            if (token.toLowerCase().startsWith("bearer ")) {
+                token = token.substring(7).trim();
+            }
+        }
+        return token;
+    }
+
     public void listGames(Context ctx) throws DataAccessException {
-        String authToken = ctx.header("authorization");
         try {
+            String authToken = getAuthToken(ctx);
+            System.out.println("[HANDLER] listGames() called with auth header: " + ctx.headerMap());
+            System.out.println("[HANDLER] extracted token = " + authToken);
+            if (authToken == null || authToken.isBlank()) {
+                throw new UnauthorizedException("missing auth token");
+            }
+
             HashSet<GameData> games = gameService.listGames(authToken);
             ctx.status(200).json(Map.of("games", games));
+
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(Map.of("message", "Error: Unauthorized"));
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
         } catch (DataAccessException e) {
-            ctx.status(500).json(Map.of("message", "Error: Internal server error"));
+            throw e;
         }
     }
 
-    public void createGame(Context ctx) {
-        String authToken = ctx.header("authorization");
+    public void createGame(Context ctx) throws DataAccessException {
         try {
-            CreateGameRequest req = new Gson().fromJson(ctx.body(), CreateGameRequest.class);
-            String gameName = req.gameName();
+            String authToken = getAuthToken(ctx);
+            if (authToken == null || authToken.isBlank()) {
+                throw new UnauthorizedException("missing auth token");
+            }
 
-            if (gameName == null || gameName.trim().isEmpty()) {
-                ctx.status(400).json(Map.of("message", "Error: gameName is missing or empty"));
+            CreateGameRequest req = new Gson().fromJson(ctx.body(), CreateGameRequest.class);
+            if (req.gameName() == null || req.gameName().trim().isEmpty()) {
+                ctx.status(400).json(Map.of("message", "Error: bad request"));
                 return;
             }
 
-            int gameID = gameService.createGame(authToken, gameName);
+            int gameID = gameService.createGame(authToken, req.gameName());
             ctx.status(200).json(Map.of("gameID", gameID));
+
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(Map.of("message", "Error: Unauthorized"));
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
         } catch (JsonSyntaxException e) {
-            ctx.status(400).json(Map.of("message", "Error: Malformed JSON"));
-        } catch (Exception e) {
-            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
+        } catch (DataAccessException e) {
+            throw e;
         }
     }
 
     public void joinGame(Context ctx) throws DataAccessException {
-        if (!ctx.body().contains("\"gameID\":")) {
-            ctx.status(400).json(Map.of("message", "Error: No gameID provided"));
-            return;
-        }
-
-        String authToken = ctx.header("authorization");
         try {
-            JoinGameData joinData = new Gson().fromJson(ctx.body(), JoinGameData.class);
-            int gameID = joinData.gameID();
-            String playerColor = joinData.playerColor();
+            String authToken = getAuthToken(ctx);
+            if (authToken == null || authToken.isBlank()) {
+                throw new UnauthorizedException("missing auth token");
+            }
 
-            boolean joinSuccess = gameService.joinGame(authToken, gameID, playerColor);
-            if (!joinSuccess) {
-                ctx.status(403).json(Map.of("message", "Error: Player color already taken"));
+            if (!ctx.body().contains("\"gameID\":")) {
+                ctx.status(400).json(Map.of("message", "Error: bad request"));
                 return;
             }
 
-            ctx.status(200).json(Map.of("message", "Successfully joined the game"));
+            JoinGameData joinData = new Gson().fromJson(ctx.body(), JoinGameData.class);
+            boolean success = gameService.joinGame(authToken, joinData.gameID(), joinData.playerColor());
+            if (!success) {
+                ctx.status(403).json(Map.of("message", "Error: already taken"));
+                return;
+            }
+
+            ctx.status(200).json(Map.of());
+
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(Map.of("message", "Error: Unauthorized"));
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
         } catch (BadRequestException e) {
-            ctx.status(400).json(Map.of("message", "Error: Bad Request"));
-        } catch (Exception e) {
-            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
+        } catch (DataAccessException e) {
+            throw e;
         }
     }
 
     public static record CreateGameRequest(String gameName) {}
-
     public static record JoinGameData(String playerColor, int gameID) {}
 }

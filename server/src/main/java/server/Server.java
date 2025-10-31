@@ -4,9 +4,9 @@ import dataaccess.*;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import service.*;
-import com.google.gson.Gson;
 import io.javalin.json.JavalinGson;
 import server.handler.*;
+import java.util.Properties;
 
 public class Server {
     UserAccess userAccess;
@@ -21,6 +21,8 @@ public class Server {
 
     public Server() {
         try {
+            DatabaseManager.loadPropertiesFromResources();
+
             DatabaseManager.createDatabase();
             DatabaseManager.createTables();
 
@@ -32,20 +34,16 @@ public class Server {
             userHandler = new UserHandler(userService);
             gameHandler = new GameHandler(gameService);
         } catch (DataAccessException e) {
-            System.err.println("Database initialization failed: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new RuntimeException("Database initialization failed", e);
         } catch (Exception e) {
-            System.err.println("Unexpected error during server startup: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Unexpected error during server startup", e);
+            throw new RuntimeException("Server startup failed", e);
         }
     }
 
     public int run(int desiredPort) {
         server = Javalin.create(config -> {
             config.staticFiles.add("web");
-            config.jsonMapper(new JavalinGson()); // <-- Add this line here
+            config.jsonMapper(new JavalinGson());
         }).start(desiredPort);
 
         server.post("/user", userHandler::register);
@@ -58,19 +56,12 @@ public class Server {
         server.put("/game", gameHandler::joinGame);
 
         server.exception(BadRequestException.class, (e, ctx) -> {
-            e.printStackTrace();
             ctx.status(400).json(new ErrorResponse("Error: bad request"));
         });
         server.exception(UnauthorizedException.class, (e, ctx) -> {
-            e.printStackTrace();
             ctx.status(401).json(new ErrorResponse("Error: unauthorized"));
         });
-        server.exception(DataAccessException.class, (e, ctx) -> {
-            e.printStackTrace();
-            ctx.status(500).json(new ErrorResponse("Database error"));
-        });
         server.exception(Exception.class, (e, ctx) -> {
-            e.printStackTrace();
             ctx.status(500).json(new ErrorResponse("Internal server error"));
         });
 
@@ -94,5 +85,9 @@ public class Server {
         public ErrorResponse(String message) { 
             this.message = message; 
         }
+    }
+
+    public static void loadProperties(Properties props) {
+        DatabaseManager.loadProperties(props);
     }
 }

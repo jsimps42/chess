@@ -63,22 +63,20 @@ public class UserHandler {
         }
     }
 
-    public void logout(Context ctx) {
+    public void logout(Context ctx) throws DataAccessException {
         try {
             String authToken = ctx.header("authorization");
-            if (authToken == null || authToken.isEmpty()) {
-                ctx.status(400).json(new ErrorResponse("Error: Missing authorization token"));
-                return;
+            if (authToken == null || authToken.isBlank()) {
+                throw new UnauthorizedException("missing auth token");
             }
 
             userService.logoutUser(authToken);
             ctx.status(200).json(new SuccessResponse("Logout successful", null));
+
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+            ctx.status(401).json(new ErrorResponse("Error: unauthorized"));
         } catch (DataAccessException e) {
-            ctx.status(500).json(new ErrorResponse("Error: Internal server error during logout"));
-        } catch (Exception e) {
-            ctx.status(500).json(new ErrorResponse("Error: Internal server error"));
+            throw e;
         }
     }
 

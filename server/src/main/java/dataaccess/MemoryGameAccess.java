@@ -10,8 +10,9 @@ public class MemoryGameAccess implements GameAccess{
     }
 
     @Override
-    public void createGame(GameData game) {
+    public int createGame(GameData game) {
         db.add(game);
+        return game.gameID();
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.UUID;
 public class MySQLAuthAccess implements AuthAccess{
     @Override
     public void addAuth(AuthData authData) throws DataAccessException {
+        System.out.println("[AUTH] INSERT token = " + authData.authToken() + " for user = " + authData.username());
         String sql = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
@@ -21,7 +22,7 @@ public class MySQLAuthAccess implements AuthAccess{
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        String sql = "SELECT username FROM auth WHERE authToken = ?";
+        System.out.println("[AUTH] LOOKING UP token = " + authToken);        String sql = "SELECT username FROM auth WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
             ps.setString(1, authToken);

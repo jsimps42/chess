@@ -1,12 +1,11 @@
 package service;
 
 import dataaccess.*;
-import model.AuthData;
-import model.UserData;
+import model.*;
 
 public class UserService {
-    UserAccess userAccess;
-    AuthAccess authAccess;
+    private final UserAccess userAccess;
+    private final AuthAccess authAccess;
 
     public UserService(UserAccess userAccess, AuthAccess authAccess) {
         this.userAccess = userAccess;
@@ -14,44 +13,40 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws BadRequestException, ForbiddenException, DataAccessException {
-        if (user == null ||
-            user.username() == null || user.username().isEmpty() ||
+        if (user == null || user.username() == null || user.username().isEmpty() ||
             user.password() == null || user.password().isEmpty() ||
             user.email() == null || user.email().isEmpty()) {
-            throw new BadRequestException("Missing required registration fields");
+            throw new BadRequestException("Missing required fields");
         }
 
-        try {
-            userAccess.addUser(user);
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-
-            if (e.getMessage().contains("already exists")) {
-                throw new ForbiddenException("User already registered");
-            }
-            
-            throw new DataAccessException("Database error: " + e.getMessage(), e);
+        if (userAccess.getUser(user.username()) != null) {
+            throw new ForbiddenException("User already exists");
         }
 
-        String authToken = AuthData.generateToken();
-        AuthData authData = new AuthData(authToken, user.username());
-        authAccess.addAuth(authData);
-
-        return authData;
+        userAccess.addUser(user);
+        String token = AuthData.generateToken();
+        AuthData auth = new AuthData(token, user.username());
+        authAccess.addAuth(auth);
+        return auth;
     }
 
     public AuthData loginUser(UserData userData) throws UnauthorizedException, DataAccessException {
-        userAccess.authenticateUser(userData.username(), userData.password());
+        try {
+            userAccess.authenticateUser(userData.username(), userData.password());
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
 
-        String authToken = AuthData.generateToken();
-        AuthData authData = new AuthData(authToken, userData.username());
-        authAccess.addAuth(authData);
-
-        return authData;
+        String token = AuthData.generateToken();
+        AuthData auth = new AuthData(token, userData.username());
+        authAccess.addAuth(auth);
+        return auth;
     }
 
     public void logoutUser(String authToken) throws UnauthorizedException, DataAccessException {
-        authAccess.getAuth(authToken);
+        if (authAccess.getAuth(authToken) == null) {
+            throw new UnauthorizedException("Invalid auth token");
+        }
         authAccess.deleteAuth(authToken);
     }
 

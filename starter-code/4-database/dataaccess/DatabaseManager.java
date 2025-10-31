@@ -65,7 +65,7 @@ public class DatabaseManager {
         }
     }
 
-    private static void loadProperties(Properties props) {
+    public static void loadProperties(Properties props) {
         databaseName = props.getProperty("db.name");
         dbUsername = props.getProperty("db.user");
         dbPassword = props.getProperty("db.password");
