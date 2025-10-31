@@ -17,6 +17,7 @@ public class MySQLGameAccessTest {
     public static void setup() throws DataAccessException {
         DatabaseManager.createDatabase();
         DatabaseManager.createTables();
+        System.out.println("[SETUP] Tables created");
         gameAccess = new MySQLGameAccess();
         userAccess = new MySQLUserAccess();
     }
@@ -41,8 +42,11 @@ public class MySQLGameAccessTest {
     @DisplayName("Test Create Game - Positive Case")
     public void testCreateGame() {
         try {
+            userAccess.addUser(new UserData("whitePlayer", "password123", "white@example.com"));
+
             ChessGame cg = new ChessGame();
             cg.resetBoard();
+            System.out.println("[TEST] cg board after reset: " + cg.getBoard().getBoard());
             GameData gd = new GameData(cg, 0, "My Game", "whitePlayer", null);
             gameAccess.createGame(gd);
 
@@ -172,6 +176,8 @@ public class MySQLGameAccessTest {
     @DisplayName("Test Clear - Positive Case (Clear Games)")
     public void testClearGames() {
         try {
+            userAccess.addUser(new UserData("whitePlayer", "password123", "white@example.com"));
+            
             ChessGame cg = new ChessGame();
             cg.resetBoard();
             GameData game1 = new GameData(cg, 0, "Chess Game", "whitePlayer", null);

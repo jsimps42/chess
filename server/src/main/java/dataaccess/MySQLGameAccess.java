@@ -19,37 +19,60 @@ public void createGame(GameData game) throws DataAccessException {
     try (var conn = DatabaseManager.getConnection();
          var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ChessGame chess = game.game();
-            if (chess == null) {
-                chess = new ChessGame();
-            }
+        ChessGame chess = game.game();
+        if (chess == null) {
+            System.out.println("[DEBUG] chess is null → creating new ChessGame");
+            chess = new ChessGame();
             chess.resetBoard();
-
-            String json = gson.toJson(chess);
-            if (json == null || json.trim().isEmpty()) {
-                json = gson.toJson(new ChessGame());
-            }
-
-            ps.setString(1, json);
-            ps.setString(2, game.gameName());
-            ps.setString(3, game.whiteUsername());
-            ps.setString(4, game.blackUsername());
-
-            int rows = ps.executeUpdate();
-            if (rows == 0) {
-                throw new DataAccessException("Failed to insert game: no rows affected");
-            }
-
-            try (var rs = ps.getGeneratedKeys()) {
-                if (!rs.next()) {
-                    throw new DataAccessException("Failed to retrieve generated game ID");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataAccessException("Error creating game", e);
+        } else {
+            System.out.println("[DEBUG] chess is NOT null");
         }
+
+        System.out.println("[DEBUG] teamTurn = " + chess.getTeamTurn());
+        System.out.println("[DEBUG] currentBoard = " + chess.getBoard());
+        if (chess.getBoard() != null) {
+            System.out.println("[DEBUG] board array = " + chess.getBoard().getBoard());
+        }
+
+        String json = gson.toJson(chess);
+        System.out.println("[DEBUG] JSON = " + json);
+
+        if (json == null || json.trim().isEmpty()) {
+            throw new DataAccessException("Gson produced null or empty JSON");
+        }
+
+        ps.setString(1, json);
+        ps.setString(2, game.gameName());
+        ps.setString(3, game.whiteUsername());
+        ps.setString(4, game.blackUsername());
+
+        System.out.println("[DEBUG] Executing SQL: " + sql);
+        int rows = ps.executeUpdate();
+        System.out.println("[DEBUG] Rows affected: " + rows);
+
+        if (rows == 0) {
+            throw new DataAccessException("No rows inserted");
+        }
+
+        try (var rs = ps.getGeneratedKeys()) {
+            if (rs.next()) {
+                int id = rs.getInt(1);
+                System.out.println("[DEBUG] Generated ID: " + id);
+            } else {
+                throw new DataAccessException("No ID generated");
+            }
+        }
+
+    } catch (SQLException e) {
+        System.err.println("[ERROR] SQL Exception: " + e.getMessage());
+        e.printStackTrace();
+        throw new DataAccessException("SQL Error: " + e.getMessage(), e);
+    } catch (Exception e) {
+        System.err.println("[ERROR] Unexpected Exception: " + e.getClass().getName() + ": " + e.getMessage());
+        e.printStackTrace();
+        throw new DataAccessException("Unexpected error: " + e.getMessage(), e);
     }
+}
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
