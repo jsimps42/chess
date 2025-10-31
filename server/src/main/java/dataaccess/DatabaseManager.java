@@ -25,6 +25,8 @@ public class DatabaseManager {
              var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
+            ex.printStackTrace();
+            System.err.println("Error while creating the database: " + ex.getMessage());
             throw new DataAccessException("failed to create database", ex);
         }
     }
@@ -50,23 +52,23 @@ public class DatabaseManager {
                     )
                 """);
 
+                stmt.executeUpdate("DROP TABLE IF EXISTS game");
                 stmt.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS game (
-                        gameID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                        gameName VARCHAR(255) NOT NULL,
-                        whiteUsername VARCHAR(255),
-                        blackUsername VARCHAR(255),
-                        gameState JSON,
-                        FOREIGN KEY (whiteUsername) REFERENCES user(username)
-                            ON DELETE SET NULL,
-                        FOREIGN KEY (blackUsername) REFERENCES user(username)
-                            ON DELETE SET NULL
+                    CREATE TABLE game (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        game_state TEXT NOT NULL,
+                        name VARCHAR(255) NOT NULL,
+                        white_username VARCHAR(255),
+                        black_username VARCHAR(255),
+                        FOREIGN KEY (white_username) REFERENCES user(username) ON DELETE SET NULL,
+                        FOREIGN KEY (black_username) REFERENCES user(username) ON DELETE SET NULL
                     )
                 """);
             }
 
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to create tables", ex);
+           ex.printStackTrace();
+            throw new DataAccessException("failed to create tables", ex);
         }
     }
 
@@ -90,6 +92,7 @@ public class DatabaseManager {
             conn.setCatalog(databaseName);
             return conn;
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new DataAccessException("failed to get connection", ex);
         }
     }
@@ -103,6 +106,7 @@ public class DatabaseManager {
             props.load(propStream);
             loadProperties(props);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new RuntimeException("unable to process db.properties", ex);
         }
     }

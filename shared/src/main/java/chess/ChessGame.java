@@ -3,6 +3,7 @@ package chess;
 import java.util.Collection;
 import piecemoves.*;
 import java.util.ArrayList;
+import com.google.gson.annotations.Expose;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -11,12 +12,12 @@ import java.util.ArrayList;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private TeamColor teamTurn;
-    private ChessBoard currentBoard = new ChessBoard();
+    @Expose private TeamColor teamTurn;
+    @Expose private ChessBoard currentBoard = new ChessBoard();
 
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
-        currentBoard.resetBoard();
+        currentBoard = new ChessBoard();
     }
 
     /**
@@ -274,6 +275,10 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return currentBoard;
+    }
+
+    public void resetBoard() {
+        currentBoard.resetBoard();
     }
 
     private ChessPosition findKing(TeamColor color) {

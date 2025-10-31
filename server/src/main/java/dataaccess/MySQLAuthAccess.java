@@ -7,47 +7,49 @@ import java.util.UUID;
 public class MySQLAuthAccess implements AuthAccess{
     @Override
     public void addAuth(AuthData authData) throws DataAccessException {
-        var statement = "INSERT INTO auth (username, authToken) VALUES (?, ?)";
-        var id = executeUpdate(statement, authData.username(), authData.authToken());
+        String sql = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)) {
+            ps.setString(1, authData.authToken());
+            ps.setString(2, authData.username());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DataAccessException("Error inserting auth", e);
+        }
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException{
-        String checkAuthSQL = "SELECT * FROM Auth WHERE authToken = ?";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement checkAuthStatement = conn.prepareStatement(checkAuthSQL)) {
-            checkAuthStatement.setString(1, authToken);
-            ResultSet rs = checkAuthStatement.executeQuery();
-            if (rs.next()) {
-                String username = rs.getString("username");
-                return new AuthData(authToken, username);
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        String sql = "SELECT username FROM auth WHERE authToken = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)) {
+            ps.setString(1, authToken);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AuthData(authToken, rs.getString("username"));
+                }
             }
-        } catch (SQLException e) {
-            System.out.println("SQL error: " + e.getMessage());
-            throw new DataAccessException(e.getMessage());
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DataAccessException("Error retrieving auth", e);
         }
-        System.out.println("AuthToken does not exist.");
-        return null;
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        String deleteAuthSQL = "DELETE FROM Auth WHERE authToken = ?";
-        try(Connection conn = DatabaseManager.getConnection();
-            PreparedStatement deleteAuthStatement = conn.prepareStatement(deleteAuthSQL)) {
-            deleteAuthStatement.setString(1, authToken);
-
-            int rowsAffected = deleteAuthStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("AuthToken deleted successfully!");
-            } else {
-                System.out.println("Error: AuthToken deletion failed.");
-                throw new NonSuccessException("AuthToken deletion failed.");
+        String sql = "DELETE FROM auth WHERE authToken = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)) {
+            ps.setString(1, authToken);
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                throw new DataAccessException("Auth token not found for deletion");
             }
-
-        } catch (SQLException e) {
-            System.out.println("Error during AuthToken deletion");
-            throw new DataAccessException(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DataAccessException("Error deleting auth", e);
         }
     }
 
@@ -56,8 +58,9 @@ public class MySQLAuthAccess implements AuthAccess{
         try (var conn = DatabaseManager.getConnection();
             var stmt = conn.createStatement()) {
             stmt.executeUpdate("DELETE FROM auth");
-        } catch (SQLException ex) {
-            throw new DataAccessException("Failed to clear tables", ex);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DataAccessException("Failed to clear tables", e);
         }
     }
 }

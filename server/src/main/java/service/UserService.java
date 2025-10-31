@@ -24,11 +24,15 @@ public class UserService {
         try {
             userAccess.addUser(user);
         } catch (DataAccessException e) {
+            e.printStackTrace();
+
             if (e.getMessage().contains("already exists")) {
                 throw new ForbiddenException("User already registered");
             }
-            throw new BadRequestException(e.getMessage());
+            
+            throw new DataAccessException("Database error: " + e.getMessage(), e);
         }
+
         String authToken = AuthData.generateToken();
         AuthData authData = new AuthData(authToken, user.username());
         authAccess.addAuth(authData);
@@ -37,34 +41,21 @@ public class UserService {
     }
 
     public AuthData loginUser(UserData userData) throws UnauthorizedException, DataAccessException {
-        boolean userAuth = false;
-        try {
-            userAuth = userAccess.authenticateUser(userData.username(), userData.password());
-        } catch (DataAccessException e) {
-            throw new UnauthorizedException();
-        }
+        userAccess.authenticateUser(userData.username(), userData.password());
 
-        if (userAuth) {
-            String authToken = AuthData.generateToken();
-            AuthData authData = new AuthData(authToken,userData.username());
-            authAccess.addAuth(authData);
-            return authData;
-        } else {
-            throw new UnauthorizedException();
-        }
+        String authToken = AuthData.generateToken();
+        AuthData authData = new AuthData(authToken, userData.username());
+        authAccess.addAuth(authData);
+
+        return authData;
     }
 
-
-    public void logoutUser(String authToken) throws UnauthorizedException, DataAccessException{
-        try {
-            authAccess.getAuth(authToken);
-        } catch (DataAccessException e) {
-            throw new UnauthorizedException();
-        }
+    public void logoutUser(String authToken) throws UnauthorizedException, DataAccessException {
+        authAccess.getAuth(authToken);
         authAccess.deleteAuth(authToken);
     }
 
-    public void clear() throws DataAccessException{
+    public void clear() throws DataAccessException {
         userAccess.clear();
         authAccess.clear();
     }

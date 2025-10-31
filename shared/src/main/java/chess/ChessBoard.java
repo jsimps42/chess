@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Arrays;
 import java.util.Objects;
+import com.google.gson.annotations.Expose;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -10,6 +11,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
+    @Expose 
     private ChessPiece[][] board;
 
     public ChessBoard() {
@@ -27,6 +29,14 @@ public class ChessBoard {
                 }
             }
         }
+    }
+
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
+
+    public void setBoard(ChessPiece[][] board) {
+        this.board = board;
     }
 
     /**

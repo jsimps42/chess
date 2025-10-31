@@ -19,7 +19,8 @@ public class MySQLUserAccess implements UserAccess{
             ps.setString(3, user.email());
             ps.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new DataAccessException("Error inserting user into DB", e);
         }
     }
@@ -40,19 +41,22 @@ public class MySQLUserAccess implements UserAccess{
                 }
             }
             return null;
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new DataAccessException("Error retrieving user from DB", e);
         }
     }
 
     @Override
-    public boolean authenticateUser(String username, String password) throws DataAccessException {
+    public void authenticateUser(String username, String password) throws DataAccessException {
         var user = getUser(username);
         if (user == null) {
-            return false;
+            throw new DataAccessException("Could not access: " + username);
         }
-        
-        return BCrypt.checkpw(password, user.password());
+        boolean matchingPassword = BCrypt.checkpw(password, user.password());
+        if (!matchingPassword) {
+            throw new DataAccessException("Could not access: " + username);
+        }
     }
 
     @Override
@@ -60,7 +64,8 @@ public class MySQLUserAccess implements UserAccess{
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.createStatement()) {
             stmt.executeUpdate("DELETE FROM user");
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new DataAccessException("Failed to clear user table", e);
         }
     }

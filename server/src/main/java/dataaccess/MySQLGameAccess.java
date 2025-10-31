@@ -4,29 +4,50 @@ import com.google.gson.Gson;
 import model.GameData;
 import java.sql.*;
 import java.util.HashSet;
+import chess.ChessGame;
 
 public class MySQLGameAccess implements GameAccess {
     private final Gson gson = new Gson();
 
     @Override
-    public void createGame(GameData game) throws DataAccessException {
-        String sql = "INSERT INTO game (name, white_username, black_username, game_state) VALUES (?, ?, ?, ?)";
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+public void createGame(GameData game) throws DataAccessException {
+    String sql = """
+        INSERT INTO game (game_state, name, white_username, black_username)
+        VALUES (?, ?, ?, ?)
+        """;
 
-            ps.setString(1, game.gameName());
-            ps.setString(2, game.whiteUsername());
-            ps.setString(3, game.blackUsername());
-            ps.setString(4, gson.toJson(game.game()));
-            ps.executeUpdate();
+    try (var conn = DatabaseManager.getConnection();
+         var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ChessGame chess = game.game();
+            if (chess == null) {
+                chess = new ChessGame();
+            }
+            chess.resetBoard();
+
+            String json = gson.toJson(chess);
+            if (json == null || json.trim().isEmpty()) {
+                json = gson.toJson(new ChessGame());
+            }
+
+            ps.setString(1, json);
+            ps.setString(2, game.gameName());
+            ps.setString(3, game.whiteUsername());
+            ps.setString(4, game.blackUsername());
+
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                throw new DataAccessException("Failed to insert game: no rows affected");
+            }
 
             try (var rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    game.setGameID(rs.getInt(1));
+                if (!rs.next()) {
+                    throw new DataAccessException("Failed to retrieve generated game ID");
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error inserting game into DB", e);
+            e.printStackTrace();
+            throw new DataAccessException("Error creating game", e);
         }
     }
 
@@ -39,9 +60,8 @@ public class MySQLGameAccess implements GameAccess {
             try (var rs = ps.executeQuery()) {
                 if (rs.next()) {
                     var gameJson = rs.getString("game_state");
-                    var chessGame = gson.fromJson(gameJson, model.ChessGame.class);
-                    return new GameData(
-                            chessGame,
+                    var chessGame = gson.fromJson(gameJson, ChessGame.class);
+                    return new GameData(chessGame,
                             rs.getInt("id"),
                             rs.getString("name"),
                             rs.getString("white_username"),
@@ -50,7 +70,8 @@ public class MySQLGameAccess implements GameAccess {
                 }
             }
             return null;
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new DataAccessException("Error retrieving game from DB", e);
         }
     }
@@ -62,17 +83,27 @@ public class MySQLGameAccess implements GameAccess {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        String sql = "UPDATE game SET name=?, white_username=?, black_username=?, game_state=? WHERE id=?";
+        String sql = """
+            UPDATE game
+            SET game_state = ?, name = ?, white_username = ?, black_username = ?
+            WHERE id = ?
+            """;
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
-            ps.setString(1, game.name());
-            ps.setString(2, game.whiteUsername());
-            ps.setString(3, game.blackUsername());
-            ps.setString(4, gson.toJson(game.game()));
+
+            ps.setString(1, gson.toJson(game.game()));
+            ps.setString(2, game.gameName());
+            ps.setString(3, game.whiteUsername());
+            ps.setString(4, game.blackUsername());
             ps.setInt(5, game.gameID());
-            ps.executeUpdate();
+
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                throw new DataAccessException("No game with id " + game.gameID());
+            }
         } catch (SQLException e) {
-            throw new DataAccessException("Error updating game in DB", e);
+            e.printStackTrace();
+            throw new DataAccessException("Error updating game", e);
         }
     }
 
@@ -85,17 +116,17 @@ public class MySQLGameAccess implements GameAccess {
              var rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                var chessGame = gson.fromJson(rs.getString("game_state"), model.ChessGame.class);
+                var chessGame = gson.fromJson(rs.getString("game_state"), ChessGame.class);
                 var game = new GameData(
+                        chessGame,
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("white_username"),
-                        rs.getString("black_username"),
-                        chessGame
-                );
+                        rs.getString("black_username"));
                 games.add(game);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new DataAccessException("Error listing games", e);
         }
         return games;
@@ -106,7 +137,8 @@ public class MySQLGameAccess implements GameAccess {
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.createStatement()) {
             stmt.executeUpdate("DELETE FROM game");
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new DataAccessException("Failed to clear game table", e);
         }
     }

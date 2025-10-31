@@ -19,23 +19,27 @@ public class Server {
 
     private Javalin server;
 
-    public Server() throws DataAccessException{
+    public Server() {
         try {
             DatabaseManager.createDatabase();
             DatabaseManager.createTables();
-            System.out.println("Database and tables verified/created.");
-        } catch (DataAccessException e) {
-            System.err.println("Failed to initialize database: " + e.getMessage());
-            e.printStackTrace();
-        }
 
-        userAccess = new MySQLUserAccess();
-        authAccess = new MySQLAuthAccess();
-        gameAccess = new MySQLGameAccess();
-        userService = new UserService(userAccess, authAccess);
-        gameService = new GameService(gameAccess, authAccess);
-        userHandler = new UserHandler(userService);
-        gameHandler = new GameHandler(gameService);
+            userAccess = new MySQLUserAccess();
+            authAccess = new MySQLAuthAccess();
+            gameAccess = new MySQLGameAccess();
+            userService = new UserService(userAccess, authAccess);
+            gameService = new GameService(gameAccess, authAccess);
+            userHandler = new UserHandler(userService);
+            gameHandler = new GameHandler(gameService);
+        } catch (DataAccessException e) {
+            System.err.println("Database initialization failed: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.err.println("Unexpected error during server startup: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Unexpected error during server startup", e);
+        }
     }
 
     public int run(int desiredPort) {
@@ -53,9 +57,22 @@ public class Server {
         server.get("/game", gameHandler::listGames);
         server.put("/game", gameHandler::joinGame);
 
-        server.exception(BadRequestException.class, (e, ctx) -> ctx.status(400).json(new ErrorResponse("Error: bad request")));
-        server.exception(UnauthorizedException.class, (e, ctx) -> ctx.status(401).json(new ErrorResponse("Error: unauthorized")));
-        server.exception(Exception.class, (e, ctx) -> ctx.status(500).json(new ErrorResponse("Internal server error")));
+        server.exception(BadRequestException.class, (e, ctx) -> {
+            e.printStackTrace();
+            ctx.status(400).json(new ErrorResponse("Error: bad request"));
+        });
+        server.exception(UnauthorizedException.class, (e, ctx) -> {
+            e.printStackTrace();
+            ctx.status(401).json(new ErrorResponse("Error: unauthorized"));
+        });
+        server.exception(DataAccessException.class, (e, ctx) -> {
+            e.printStackTrace();
+            ctx.status(500).json(new ErrorResponse("Database error"));
+        });
+        server.exception(Exception.class, (e, ctx) -> {
+            e.printStackTrace();
+            ctx.status(500).json(new ErrorResponse("Internal server error"));
+        });
 
         return server.port();
     }
@@ -66,7 +83,7 @@ public class Server {
         }
     }
 
-    private void clear(Context ctx) {
+    private void clear(Context ctx) throws DataAccessException {
         gameService.clear();
         userService.clear();
         ctx.status(200).json("{}");

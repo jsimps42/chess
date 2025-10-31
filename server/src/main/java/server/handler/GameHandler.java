@@ -13,26 +13,27 @@ import dataaccess.DataAccessException;
 
 public class GameHandler {
 
-    GameService gameService;
+    private final GameService gameService;
 
     public GameHandler(GameService gameService) {
         this.gameService = gameService;
     }
 
-    public void listGames(Context ctx) {
+    public void listGames(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         try {
             HashSet<GameData> games = gameService.listGames(authToken);
             ctx.status(200).json(Map.of("games", games));
         } catch (UnauthorizedException e) {
             ctx.status(401).json(Map.of("message", "Error: Unauthorized"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: Internal server error"));
         }
     }
 
     public void createGame(Context ctx) {
         String authToken = ctx.header("authorization");
         try {
-            record CreateGameRequest(String gameName) {}
             CreateGameRequest req = new Gson().fromJson(ctx.body(), CreateGameRequest.class);
             String gameName = req.gameName();
 
@@ -44,33 +45,43 @@ public class GameHandler {
             int gameID = gameService.createGame(authToken, gameName);
             ctx.status(200).json(Map.of("gameID", gameID));
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+            ctx.status(401).json(Map.of("message", "Error: Unauthorized"));
         } catch (JsonSyntaxException e) {
-            ctx.status(400).json(Map.of("message", "Error: malformed JSON"));
+            ctx.status(400).json(Map.of("message", "Error: Malformed JSON"));
         } catch (Exception e) {
             ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
 
-    public void joinGame(Context ctx) {
+    public void joinGame(Context ctx) throws DataAccessException {
         if (!ctx.body().contains("\"gameID\":")) {
             ctx.status(400).json(Map.of("message", "Error: No gameID provided"));
             return;
         }
+
         String authToken = ctx.header("authorization");
-        record JoinGameData(String playerColor, int gameID) {}
-        JoinGameData joinData = new Gson().fromJson(ctx.body(), JoinGameData.class);
         try {
-            boolean joinSuccess = gameService.joinGame(authToken, joinData.gameID(), joinData.playerColor());
+            JoinGameData joinData = new Gson().fromJson(ctx.body(), JoinGameData.class);
+            int gameID = joinData.gameID();
+            String playerColor = joinData.playerColor();
+
+            boolean joinSuccess = gameService.joinGame(authToken, gameID, playerColor);
             if (!joinSuccess) {
-                ctx.status(403).json(Map.of("message", "Error: already taken"));
+                ctx.status(403).json(Map.of("message", "Error: Player color already taken"));
                 return;
             }
-            ctx.status(200).json(Map.of());
+
+            ctx.status(200).json(Map.of("message", "Successfully joined the game"));
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+            ctx.status(401).json(Map.of("message", "Error: Unauthorized"));
         } catch (BadRequestException e) {
-            ctx.status(400).json(Map.of("message", "Error: bad request"));
+            ctx.status(400).json(Map.of("message", "Error: Bad Request"));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
+
+    public static record CreateGameRequest(String gameName) {}
+
+    public static record JoinGameData(String playerColor, int gameID) {}
 }

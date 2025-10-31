@@ -3,6 +3,7 @@ package chess;
 import java.util.Collection;
 import piecemoves.*;
 import java.util.Objects;
+import com.google.gson.annotations.Expose;
 
 /**
  * Represents a single chess piece
@@ -11,8 +12,8 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessGame.TeamColor pieceColor;
-    private ChessPiece.PieceType type;
+    @Expose private ChessGame.TeamColor pieceColor;
+    @Expose private ChessPiece.PieceType type;
     private Collection<ChessMove> moves;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -50,6 +51,14 @@ public class ChessPiece {
      */
     public PieceType getPieceType() {
         return type;
+    }
+
+    public void setTeamColor(ChessGame.TeamColor pieceColor) {
+        this.pieceColor = pieceColor;
+    }
+
+    public void setPieceType(ChessPiece.PieceType type) {
+        this.type = type;
     }
 
     /**
