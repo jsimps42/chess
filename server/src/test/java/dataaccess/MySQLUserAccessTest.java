@@ -22,13 +22,6 @@ public class MySQLUserAccessTest {
         new MySQLUserAccess().clear();
     }
 
-    private void addLoginLogout(String username, String password) throws DataAccessException {
-        UserData user = new UserData(username, password, username + "@example.com");
-        userAccess.addUser(user);
-
-        userAccess.authenticateUser(username, password);
-    }
-
     @Test
     @DisplayName("Test Add User - Positive Case")
     public void testAddUser() {
