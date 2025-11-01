@@ -24,8 +24,18 @@ public class MySQLUserAccessTest {
     }
 
     private void addTestUser() throws DataAccessException {
-        UserData user = new UserData("testUser", "password123", "testuser@example.com");
-        userAccess.addUser(user);
+        userAccess.addUser(new UserData("testUser", "password123", "testuser@example.com"));
+    }
+
+    private void addExistingUser() throws DataAccessException {
+        userAccess.addUser(new UserData("existingUser", "password123", "existing@example.com"));
+    }
+
+    private void assertUserExists(String username, String email) throws DataAccessException {
+        UserData retrieved = userAccess.getUser(username);
+        assertNotNull(retrieved);
+        assertEquals(username, retrieved.username());
+        assertEquals(email, retrieved.email());
     }
 
     @Test
@@ -33,10 +43,7 @@ public class MySQLUserAccessTest {
     public void testAddUser() {
         try {
             addTestUser();
-            UserData retrieved = userAccess.getUser("testUser");
-            assertNotNull(retrieved);
-            assertEquals("testUser", retrieved.username());
-            assertEquals("testuser@example.com", retrieved.email());
+            assertUserExists("testUser", "testuser@example.com");
         } catch (DataAccessException e) {
             fail(e.getMessage());
         }
@@ -46,8 +53,7 @@ public class MySQLUserAccessTest {
     @DisplayName("Test Add User - Negative Case (Username Already Exists)")
     public void testAddUserWithExistingUsername() {
         try {
-            UserData existing = new UserData("existingUser", "password123", "existing@example.com");
-            userAccess.addUser(existing);
+            addExistingUser();
             UserData duplicate = new UserData("existingUser", "newPassword123", "new@example.com");
             assertThrows(DataAccessException.class, () -> userAccess.addUser(duplicate));
         } catch (DataAccessException e) {
@@ -60,10 +66,7 @@ public class MySQLUserAccessTest {
     public void testGetUser() {
         try {
             addTestUser();
-            UserData retrieved = userAccess.getUser("testUser");
-            assertNotNull(retrieved);
-            assertEquals("testUser", retrieved.username());
-            assertEquals("testuser@example.com", retrieved.email());
+            assertUserExists("testUser", "testuser@example.com");
         } catch (DataAccessException e) {
             fail(e.getMessage());
         }
