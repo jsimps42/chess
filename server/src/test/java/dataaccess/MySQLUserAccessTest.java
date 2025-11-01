@@ -1,6 +1,7 @@
 package dataaccess;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.*;
 import dataaccess.*;
 import model.UserData;
@@ -26,11 +27,10 @@ public class MySQLUserAccessTest {
     @DisplayName("Test Add User - Positive Case")
     public void testAddUser() {
         try {
-            UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
-            userAccess.addUser(newUser);
-
+            UserData user = new UserData("testUser", "password123", "testuser@example.com");
+            userAccess.addUser(user);
             UserData retrieved = userAccess.getUser("testUser");
-            assertNotNull(retrieved, "User should be found in the database.");
+            assertNotNull(retrieved);
             assertEquals("testUser", retrieved.username());
             assertEquals("testuser@example.com", retrieved.email());
         } catch (DataAccessException e) {
@@ -44,13 +44,8 @@ public class MySQLUserAccessTest {
         try {
             UserData existing = new UserData("existingUser", "password123", "existing@example.com");
             userAccess.addUser(existing);
-
             UserData duplicate = new UserData("existingUser", "newPassword123", "new@example.com");
-
-            assertThrows(
-                    DataAccessException.class,
-                    () -> userAccess.addUser(duplicate),
-                    "Adding a user with the same username should throw a DataAccessException.");
+            assertThrows(DataAccessException.class, () -> userAccess.addUser(duplicate));
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
@@ -60,11 +55,10 @@ public class MySQLUserAccessTest {
     @DisplayName("Test Get User - Positive Case")
     public void testGetUser() {
         try {
-            UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
-            userAccess.addUser(newUser);
-
+            UserData user = new UserData("testUser", "password123", "testuser@example.com");
+            userAccess.addUser(user);
             UserData retrieved = userAccess.getUser("testUser");
-            assertNotNull(retrieved, "User should be found in the database.");
+            assertNotNull(retrieved);
             assertEquals("testUser", retrieved.username());
             assertEquals("testuser@example.com", retrieved.email());
         } catch (DataAccessException e) {
@@ -77,7 +71,7 @@ public class MySQLUserAccessTest {
     public void testGetNonExistentUser() {
         try {
             UserData retrieved = userAccess.getUser("nonExistentUser");
-            assertNull(retrieved, "User should not be found in the database.");
+            assertNull(retrieved);
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
@@ -87,9 +81,8 @@ public class MySQLUserAccessTest {
     @DisplayName("Test Authenticate User - Positive Case")
     public void testAuthenticateUser() {
         try {
-            UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
-            userAccess.addUser(newUser);
-
+            UserData user = new UserData("testUser", "password123", "testuser@example.com");
+            userAccess.addUser(user);
             userAccess.authenticateUser("testUser", "password123");
         } catch (Exception e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
@@ -100,13 +93,9 @@ public class MySQLUserAccessTest {
     @DisplayName("Test Authenticate User - Negative Case (Incorrect Password)")
     public void testAuthenticateUserIncorrectPassword() {
         try {
-            UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
-            userAccess.addUser(newUser);
-
-            assertThrows(
-                    DataAccessException.class,
-                    () -> userAccess.authenticateUser("testUser", "wrongPassword"),
-                    "Authenticating with an incorrect password should throw a DataAccessException.");
+            UserData user = new UserData("testUser", "password123", "testuser@example.com");
+            userAccess.addUser(user);
+            assertThrows(DataAccessException.class, () -> userAccess.authenticateUser("testUser", "wrongPassword"));
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
@@ -116,13 +105,11 @@ public class MySQLUserAccessTest {
     @DisplayName("Test Clear - Positive Case")
     public void testClear() {
         try {
-            UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
-            userAccess.addUser(newUser);
-
+            UserData user = new UserData("testUser", "password123", "testuser@example.com");
+            userAccess.addUser(user);
             userAccess.clear();
-
             UserData retrieved = userAccess.getUser("testUser");
-            assertNull(retrieved, "User should be deleted from the database.");
+            assertNull(retrieved);
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
