@@ -23,71 +23,71 @@ public class DatabaseManager {
     }
 
     public static void createTables() throws DataAccessException {
-    synchronized (lock) {
-        if (tablesCreated) {
-            System.out.println("[DB] Tables already created – skipping");
-            return;
-        }
-
-        try (var conn = getConnection();
-             var stmt = conn.createStatement()) {
-
-            stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS user (
-                    username VARCHAR(255) NOT NULL PRIMARY KEY,
-                    password VARCHAR(255) NOT NULL,
-                    email VARCHAR(255)
-                )
-            """);
-
-            stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS auth (
-                    authToken VARCHAR(255) NOT NULL PRIMARY KEY,
-                    username VARCHAR(255) NOT NULL
-                )
-            """);
-
-            stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS game (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    game_state TEXT NOT NULL,
-                    name VARCHAR(255) NOT NULL,
-                    white_username VARCHAR(255),
-                    black_username VARCHAR(255)
-                )
-            """);
-
-            stmt.executeUpdate("""
-                ALTER TABLE auth
-                ADD CONSTRAINT fk_auth_user
-                FOREIGN KEY (username) REFERENCES user(username) ON DELETE CASCADE
-            """);
-
-            stmt.executeUpdate("""
-                ALTER TABLE game
-                ADD CONSTRAINT fk_game_white
-                FOREIGN KEY (white_username) REFERENCES user(username) ON DELETE SET NULL
-            """);
-
-            stmt.executeUpdate("""
-                ALTER TABLE game
-                ADD CONSTRAINT fk_game_black
-                FOREIGN KEY (black_username) REFERENCES user(username) ON DELETE SET NULL
-            """);
-
-        } catch (SQLException e) {
-            String msg = e.getMessage().toLowerCase();
-            if (!msg.contains("duplicate") && !msg.contains("already exists")) {
-                throw new DataAccessException("Failed to create tables: " + e.getMessage(), e);
+        synchronized (lock) {
+            if (tablesCreated) {
+                System.out.println("[DB] Tables already created – skipping");
+                return;
             }
-            // else: ignore duplicate constraint
-        } finally {
-            tablesCreated = true;  // Always set
-        }
 
-        System.out.println("[DB] Tables and constraints created (idempotent)");
+            try (var conn = getConnection();
+                 var stmt = conn.createStatement()) {
+
+                stmt.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS user (
+                        username VARCHAR(255) NOT NULL PRIMARY KEY,
+                        password VARCHAR(255) NOT NULL,
+                        email VARCHAR(255)
+                    )
+                """);
+
+                stmt.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS auth (
+                        authToken VARCHAR(255) NOT NULL PRIMARY KEY,
+                        username VARCHAR(255) NOT NULL
+                    )
+                """);
+
+                stmt.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS game (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        game_state TEXT NOT NULL,
+                        name VARCHAR(255) NOT NULL,
+                        white_username VARCHAR(255),
+                        black_username VARCHAR(255)
+                    )
+                """);
+
+                try { stmt.executeUpdate("ALTER TABLE auth DROP FOREIGN KEY IF EXISTS fk_auth_user;"); } catch (SQLException ignored) {}
+                try { stmt.executeUpdate("ALTER TABLE game DROP FOREIGN KEY IF EXISTS fk_game_white;"); } catch (SQLException ignored) {}
+                try { stmt.executeUpdate("ALTER TABLE game DROP FOREIGN KEY IF EXISTS fk_game_black;"); } catch (SQLException ignored) {}
+
+                stmt.executeUpdate("""
+                    ALTER TABLE auth
+                    ADD CONSTRAINT fk_auth_user
+                    FOREIGN KEY (username) REFERENCES user(username) ON DELETE CASCADE
+                    """);
+
+                stmt.executeUpdate("""
+                    ALTER TABLE game
+                    ADD CONSTRAINT fk_game_white
+                    FOREIGN KEY (white_username) REFERENCES user(username) ON DELETE SET NULL
+                    """);
+
+                stmt.executeUpdate("""
+                    ALTER TABLE game
+                    ADD CONSTRAINT fk_game_black
+                    FOREIGN KEY (black_username) REFERENCES user(username) ON DELETE SET NULL
+                    """);
+
+            } catch (SQLException e) {
+                throw new DataAccessException("Failed to create tables: " + e.getMessage(), e);
+            } finally {
+                tablesCreated = true;
+            }
+
+            System.out.println("[DB] Tables and constraints created (idempotent)");
+        }
     }
-}
 
     public static Connection getConnection() throws DataAccessException {
         try {
@@ -121,5 +121,11 @@ public class DatabaseManager {
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+    }
+
+    public static void resetTablesCreated() {
+        synchronized (lock) {
+            tablesCreated = false;
+        }
     }
 }

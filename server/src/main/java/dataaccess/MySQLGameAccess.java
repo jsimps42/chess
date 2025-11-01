@@ -120,7 +120,7 @@ public class MySQLGameAccess implements GameAccess {
              var stmt = conn.createStatement()) {
             stmt.executeUpdate("DELETE FROM game");
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to clear games: " + e.getMessage());
+            throw new DataAccessException("Failed to clear games", e);
         }
     }
 }

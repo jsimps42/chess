@@ -59,6 +59,7 @@ public class Server {
                 System.out.println("Clearing games...");
                 gameService.clear();
                 System.out.println("Games cleared");
+                DatabaseManager.resetTablesCreated();
                 ctx.status(200).json(Map.of());
             } catch (Exception e) {
                 System.out.println("EXCEPTION IN /db: " + e.getClass().getName() + ": " + e.getMessage());
