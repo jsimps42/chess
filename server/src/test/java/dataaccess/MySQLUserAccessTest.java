@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 import dataaccess.*;
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 public class MySQLUserAccessTest {
 
@@ -23,18 +22,24 @@ public class MySQLUserAccessTest {
         new MySQLUserAccess().clear();
     }
 
+    private void addLoginLogout(String username, String password) throws DataAccessException {
+        UserData user = new UserData(username, password, username + "@example.com");
+        userAccess.addUser(user);
+
+        userAccess.authenticateUser(username, password);
+    }
+
     @Test
     @DisplayName("Test Add User - Positive Case")
     public void testAddUser() {
         try {
             UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
-
             userAccess.addUser(newUser);
 
-            UserData retrievedUser = userAccess.getUser("testUser");
-            assertNotNull(retrievedUser, "User should be found in the database.");
-            assertEquals("testUser", retrievedUser.username());
-            assertEquals("testuser@example.com", retrievedUser.email());
+            UserData retrieved = userAccess.getUser("testUser");
+            assertNotNull(retrieved, "User should be found in the database.");
+            assertEquals("testUser", retrieved.username());
+            assertEquals("testuser@example.com", retrieved.email());
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
@@ -44,13 +49,15 @@ public class MySQLUserAccessTest {
     @DisplayName("Test Add User - Negative Case (Username Already Exists)")
     public void testAddUserWithExistingUsername() {
         try {
-            UserData existingUser = new UserData("existingUser", "password123", "existing@example.com");
-            userAccess.addUser(existingUser);
+            UserData existing = new UserData("existingUser", "password123", "existing@example.com");
+            userAccess.addUser(existing);
 
-            UserData newUser = new UserData("existingUser", "newPassword123", "new@example.com");
+            UserData duplicate = new UserData("existingUser", "newPassword123", "new@example.com");
 
-            assertThrows(DataAccessException.class, () -> userAccess.addUser(newUser), 
-                "Adding a user with the same username should throw a DataAccessException.");
+            assertThrows(
+                    DataAccessException.class,
+                    () -> userAccess.addUser(duplicate),
+                    "Adding a user with the same username should throw a DataAccessException.");
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
@@ -63,11 +70,10 @@ public class MySQLUserAccessTest {
             UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
             userAccess.addUser(newUser);
 
-            UserData retrievedUser = userAccess.getUser("testUser");
-
-            assertNotNull(retrievedUser, "User should be found in the database.");
-            assertEquals("testUser", retrievedUser.username());
-            assertEquals("testuser@example.com", retrievedUser.email());
+            UserData retrieved = userAccess.getUser("testUser");
+            assertNotNull(retrieved, "User should be found in the database.");
+            assertEquals("testUser", retrieved.username());
+            assertEquals("testuser@example.com", retrieved.email());
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
@@ -77,9 +83,8 @@ public class MySQLUserAccessTest {
     @DisplayName("Test Get User - Negative Case (User Does Not Exist)")
     public void testGetNonExistentUser() {
         try {
-            UserData retrievedUser = userAccess.getUser("nonExistentUser");
-
-            assertNull(retrievedUser, "User should not be found in the database.");
+            UserData retrieved = userAccess.getUser("nonExistentUser");
+            assertNull(retrieved, "User should not be found in the database.");
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
@@ -91,6 +96,7 @@ public class MySQLUserAccessTest {
         try {
             UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
             userAccess.addUser(newUser);
+
             userAccess.authenticateUser("testUser", "password123");
         } catch (Exception e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
@@ -104,8 +110,10 @@ public class MySQLUserAccessTest {
             UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
             userAccess.addUser(newUser);
 
-            assertThrows(DataAccessException.class, () -> userAccess.authenticateUser("testUser", "wrongPassword"),
-                "Authenticating with an incorrect password should throw a DataAccessException.");
+            assertThrows(
+                    DataAccessException.class,
+                    () -> userAccess.authenticateUser("testUser", "wrongPassword"),
+                    "Authenticating with an incorrect password should throw a DataAccessException.");
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
@@ -120,8 +128,8 @@ public class MySQLUserAccessTest {
 
             userAccess.clear();
 
-            UserData retrievedUser = userAccess.getUser("testUser");
-            assertNull(retrievedUser, "User should be deleted from the database.");
+            UserData retrieved = userAccess.getUser("testUser");
+            assertNull(retrieved, "User should be deleted from the database.");
         } catch (DataAccessException e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
