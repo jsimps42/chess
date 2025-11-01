@@ -22,7 +22,9 @@ public class GameHandler {
 
     private String getAuthToken(Context ctx) {
         String token = ctx.header("authorization");
-        if (token == null) token = ctx.header("Authorization");
+        if (token == null) {
+            token = ctx.header("Authorization");
+        }
         if (token != null && token.toLowerCase().startsWith("bearer ")) {
             token = token.substring(7).trim();
         }

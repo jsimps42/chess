@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class DatabaseManager {
     private static boolean tablesCreated = false;
-    private static final Object lock = new Object();
+    private static final Object LOCK = new Object();
     private static String databaseName;
     private static String dbUsername;
     private static String dbPassword;
@@ -23,7 +23,7 @@ public class DatabaseManager {
     }
 
     public static void createTables() throws DataAccessException {
-        synchronized (lock) {
+        synchronized (LOCK) {
             if (tablesCreated) {
                 System.out.println("[DB] Tables already created – skipping");
                 return;
@@ -124,7 +124,7 @@ public class DatabaseManager {
     }
 
     public static void resetTablesCreated() {
-        synchronized (lock) {
+        synchronized (LOCK) {
             tablesCreated = false;
         }
     }

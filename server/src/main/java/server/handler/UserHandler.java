@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class UserHandler {
     private final UserService userService;
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     public UserHandler(UserService userService) {
         this.userService = userService;
@@ -17,7 +17,7 @@ public class UserHandler {
 
     public void register(Context ctx) {
         try {
-            UserData user = gson.fromJson(ctx.body(), UserData.class);
+            UserData user = GSON.fromJson(ctx.body(), UserData.class);
             AuthData auth = userService.register(user);
             ctx.status(200).json(Map.of(
                     "username", auth.username(),
@@ -36,7 +36,7 @@ public class UserHandler {
 
     public void login(Context ctx) {
         try {
-            UserData user = gson.fromJson(ctx.body(), UserData.class);
+            UserData user = GSON.fromJson(ctx.body(), UserData.class);
             if (user == null || user.username() == null || user.username().isBlank()
                 || user.password() == null || user.password().isBlank()) {
                 ctx.status(400).json(Map.of("message", "Error: bad request"));

@@ -14,7 +14,9 @@ public class MemoryAuthAccess implements AuthAccess {
     @Override
     public AuthData getAuth(String token) {
         for (AuthData a : db) {
-            if (a.authToken().equals(token)) return a;
+            if (a.authToken().equals(token)) {
+                return a;
+            }
         }
         return null;
     }

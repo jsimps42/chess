@@ -86,8 +86,12 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChessBoard that)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ChessBoard that)) {
+            return false;
+        }
         return Objects.deepEquals(this.board, that.board);
     }
 
@@ -101,7 +105,9 @@ public class ChessBoard {
         StringBuilder sb = new StringBuilder("ChessBoard{board=");
         sb.append('[');
         for (int r = 0; r < 8; r++) {
-            if (r > 0) sb.append(", ");
+            if (r > 0) {
+                sb.append(", ");
+            }
             sb.append(Arrays.toString(board[r]));
         }
         sb.append("]}");
