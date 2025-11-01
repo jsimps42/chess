@@ -22,20 +22,21 @@ public class MySQLAuthAccess implements AuthAccess{
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        System.out.println("[AUTH] LOOKING UP token = " + authToken);        String sql = "SELECT username FROM auth WHERE authToken = ?";
+        if (authToken == null || authToken.isBlank()) {
+            return null;
+        }
         try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(sql)) {
+             var ps = conn.prepareStatement("SELECT username FROM auth WHERE authToken = ?")) {
             ps.setString(1, authToken);
             try (var rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return new AuthData(authToken, rs.getString("username"));
                 }
             }
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new DataAccessException("Error retrieving auth", e);
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error in getAuth: " + e.getMessage());
         }
+        return null;
     }
 
     @Override

@@ -6,6 +6,7 @@ import io.javalin.http.Context;
 import service.*;
 import io.javalin.json.JavalinGson;
 import server.handler.*;
+import java.util.Map;
 import java.util.Properties;
 
 public class Server {
@@ -49,17 +50,28 @@ public class Server {
         server.post("/user", userHandler::register);
         server.post("/session", userHandler::login);
         server.delete("/session", userHandler::logout);
-        server.delete("/db", this::clear);
-        
+        server.delete("/db", ctx -> {
+            System.out.println("CLEAR /db CALLED");
+            try {
+                System.out.println("Clearing users...");
+                userService.clear();
+                System.out.println("Users cleared");
+                System.out.println("Clearing games...");
+                gameService.clear();
+                System.out.println("Games cleared");
+                ctx.status(200).json(Map.of());
+            } catch (Exception e) {
+                System.out.println("EXCEPTION IN /db: " + e.getClass().getName() + ": " + e.getMessage());
+                e.printStackTrace();
+                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+            }
+        });
         server.post("/game", gameHandler::createGame);
         server.get("/game", gameHandler::listGames);
         server.put("/game", gameHandler::joinGame);
 
         server.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse("Error: bad request"));
-        });
-        server.exception(UnauthorizedException.class, (e, ctx) -> {
-            ctx.status(401).json(new ErrorResponse("Error: unauthorized"));
         });
         server.exception(Exception.class, (e, ctx) -> {
             ctx.status(500).json(new ErrorResponse("Internal server error"));
@@ -72,12 +84,6 @@ public class Server {
         if (server != null) {
             server.stop();
         }
-    }
-
-    private void clear(Context ctx) throws DataAccessException {
-        gameService.clear();
-        userService.clear();
-        ctx.status(200).json("{}");
     }
 
     private static class ErrorResponse {

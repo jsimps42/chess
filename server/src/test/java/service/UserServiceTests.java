@@ -7,15 +7,15 @@ import model.*;
 
 //These are unit Tests tests Tests tests
 public class UserServiceTests {
-    UserService userService;
+    private UserService userService;
     UserAccess userAccess;
     AuthAccess authAccess;
     UserData testUser = new UserData("user1", "pass", "email@example.com");
 
     @BeforeEach
-    void setup() {
-        userAccess = new MemoryUserAccess();
-        authAccess = new MemoryAuthAccess();
+    public void setup() {
+        var userAccess = new MemoryUserAccess();
+        var authAccess = new MemoryAuthAccess();
         userService = new UserService(userAccess, authAccess);
     }
 

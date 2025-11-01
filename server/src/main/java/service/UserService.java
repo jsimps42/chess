@@ -12,17 +12,16 @@ public class UserService {
         this.authAccess = authAccess;
     }
 
-    public AuthData register(UserData user) throws BadRequestException, ForbiddenException, DataAccessException {
-        if (user == null || user.username() == null || user.username().isEmpty() ||
-            user.password() == null || user.password().isEmpty() ||
-            user.email() == null || user.email().isEmpty()) {
-            throw new BadRequestException("Missing required fields");
+    public AuthData register(UserData user)
+            throws BadRequestException, ForbiddenException, DataAccessException {
+        if (user == null || user.username() == null || user.username().isBlank()
+                || user.password() == null || user.password().isBlank()
+                || user.email() == null || user.email().isBlank()) {
+            throw new BadRequestException("bad request");
         }
-
         if (userAccess.getUser(user.username()) != null) {
-            throw new ForbiddenException("User already exists");
+            throw new ForbiddenException("already taken");
         }
-
         userAccess.addUser(user);
         String token = AuthData.generateToken();
         AuthData auth = new AuthData(token, user.username());
@@ -30,22 +29,18 @@ public class UserService {
         return auth;
     }
 
-    public AuthData loginUser(UserData userData) throws UnauthorizedException, DataAccessException {
-        try {
-            userAccess.authenticateUser(userData.username(), userData.password());
-        } catch (DataAccessException e) {
-            throw new UnauthorizedException("Invalid credentials");
-        }
-
+    public AuthData loginUser(UserData userData) throws DataAccessException {
+        userAccess.authenticateUser(userData.username(), userData.password());
         String token = AuthData.generateToken();
         AuthData auth = new AuthData(token, userData.username());
         authAccess.addAuth(auth);
         return auth;
     }
 
-    public void logoutUser(String authToken) throws UnauthorizedException, DataAccessException {
+    public void logoutUser(String authToken)
+            throws UnauthorizedException, DataAccessException {
         if (authAccess.getAuth(authToken) == null) {
-            throw new UnauthorizedException("Invalid auth token");
+            throw new UnauthorizedException("bad auth");
         }
         authAccess.deleteAuth(authToken);
     }

@@ -5,20 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="da651269-3b4b-4f19-90ef-949d0fa95781" name="Changes" comment="Please detect my tests, I have tests already">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_22_2025_7_17_PM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_22_2025_7_17_PM__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/DatabaseManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/GameAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/GameAccess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryGameAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryGameAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/GameSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/GameSerializer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySQLAuthAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySQLAuthAccess.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySQLGameAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySQLGameAccess.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySQLUserAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySQLUserAccess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/handler/GameHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handler/GameHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/handler/UserHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handler/UserHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/service/GameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/service/GameService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/test/java/dataaccess/MySQLAuthAccessTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/dataaccess/MySQLAuthAccessTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/test/java/dataaccess/MySQLGameAccessTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/dataaccess/MySQLGameAccessTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/test/java/dataaccess/MySQLUserAccessTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/dataaccess/MySQLUserAccessTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/test/java/passoff/model/TestCreateResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/passoff/model/TestCreateResult.java" afterDir="false" />
@@ -26,9 +20,10 @@
       <change beforePath="$PROJECT_DIR$/server/src/test/java/passoff/server/StandardAPITests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/passoff/server/StandardAPITests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/test/java/service/GameServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/service/GameServiceTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/test/java/service/UserServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/service/UserServiceTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/test/java/passoff/chess/extracredit/CastlingTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/test/java/passoff/chess/extracredit/CastlingTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/test/java/passoff/chess/extracredit/EnPassantTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/test/java/passoff/chess/extracredit/EnPassantTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/starter-code/4-database/dataaccess/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/starter-code/4-database/dataaccess/DatabaseManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessBoard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPiece.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPiece.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/piecemoves/PawnMove.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/piecemoves/PawnMove.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +61,7 @@
     "JUnit.BishopMoveTests.bishopMoveUntilEdge.executor": "Run",
     "JUnit.DatabaseTests.executor": "Run",
     "JUnit.DatabaseTests.persistenceTest.executor": "Run",
+    "JUnit.MySQLAuthAccessTest.executor": "Run",
     "JUnit.test in server.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -75,27 +71,11 @@
     "last_opened_file_path": "C:/Users/Jake/OneDrive/Documents/GitHub/chess"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.DatabaseTests.persistenceTest">
+  <component name="RunManager" selected="JUnit.MySQLAuthAccessTest">
     <configuration name="All in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="BishopMoveTests.bishopBlocked" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="shared" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="passoff.chess.piecemoves.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="passoff.chess.piecemoves" />
-      <option name="MAIN_CLASS_NAME" value="passoff.chess.piecemoves.BishopMoveTests" />
-      <option name="METHOD_NAME" value="bishopBlocked" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -131,6 +111,21 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MySQLAuthAccessTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dataaccess.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dataaccess" />
+      <option name="MAIN_CLASS_NAME" value="dataaccess.MySQLAuthAccessTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="test in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <option name="TEST_OBJECT" value="directory" />
@@ -141,11 +136,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.DatabaseTests.persistenceTest" />
+        <item itemvalue="JUnit.MySQLAuthAccessTest" />
         <item itemvalue="JUnit.DatabaseTests" />
+        <item itemvalue="JUnit.DatabaseTests.persistenceTest" />
         <item itemvalue="JUnit.test in server" />
         <item itemvalue="JUnit.All in server" />
-        <item itemvalue="JUnit.BishopMoveTests.bishopBlocked" />
       </list>
     </recent_temporary>
   </component>

@@ -15,17 +15,16 @@ public class MySQLGameAccessTest {
 
     @BeforeAll
     public static void setup() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        DatabaseManager.createTables();
-        System.out.println("[SETUP] Tables created");
         gameAccess = new MySQLGameAccess();
         userAccess = new MySQLUserAccess();
     }
 
     @BeforeEach
-    void init() throws DataAccessException {
-        gameAccess.clear();
-        userAccess.clear();  // Use static instance
+    public void clearAll() throws DataAccessException {  // ADD THIS
+        DatabaseManager.loadPropertiesFromResources();
+        DatabaseManager.createDatabase();
+        DatabaseManager.createTables();
+        new MySQLAuthAccess().clear();
     }
 
     // Helper method
@@ -45,8 +44,7 @@ public class MySQLGameAccessTest {
             userAccess.addUser(new UserData("whitePlayer", "password123", "white@example.com"));
 
             ChessGame cg = new ChessGame();
-            cg.resetBoard();
-            System.out.println("[TEST] cg board after reset: " + cg.getBoard().getBoard());
+            System.out.println("[TEST] cg board after reset: " + cg.getBoard());
             GameData gd = new GameData(cg, 0, "My Game", "whitePlayer", null);
             gameAccess.createGame(gd);
 
@@ -67,7 +65,6 @@ public class MySQLGameAccessTest {
             userAccess.addUser(new UserData("whitePlayer", "password123", "white@example.com"));
 
             ChessGame cg = new ChessGame();
-            cg.resetBoard();
             GameData gd = new GameData(cg, 0, "My Game", "whitePlayer", null);
             gameAccess.createGame(gd);
 
@@ -102,7 +99,6 @@ public class MySQLGameAccessTest {
             userAccess.addUser(new UserData("whitePlayer", "password123", "white@example.com"));
 
             ChessGame cg = new ChessGame();
-            cg.resetBoard();
             GameData gd = new GameData(cg, 0, "My Game", "whitePlayer", null);
             gameAccess.createGame(gd);
 
@@ -124,7 +120,6 @@ public class MySQLGameAccessTest {
             userAccess.addUser(new UserData("whitePlayer", "pw", "w@x.com"));
 
             ChessGame cg = new ChessGame();
-            cg.resetBoard();
             GameData original = new GameData(cg, 0, "Original Name", "whitePlayer", null);
             gameAccess.createGame(original);
 
@@ -157,9 +152,7 @@ public class MySQLGameAccessTest {
             userAccess.addUser(new UserData("player2", "pass", "e2@a.com"));
 
             ChessGame cg1 = new ChessGame();
-            cg1.resetBoard();
             ChessGame cg2 = new ChessGame();
-            cg2.resetBoard();
 
             gameAccess.createGame(new GameData(cg1, 0, "Game A", "player1", null));
             gameAccess.createGame(new GameData(cg2, 0, "Game B", null, "player2"));
@@ -179,7 +172,6 @@ public class MySQLGameAccessTest {
             userAccess.addUser(new UserData("whitePlayer", "password123", "white@example.com"));
             
             ChessGame cg = new ChessGame();
-            cg.resetBoard();
             GameData game1 = new GameData(cg, 0, "Chess Game", "whitePlayer", null);
             gameAccess.createGame(game1);
 

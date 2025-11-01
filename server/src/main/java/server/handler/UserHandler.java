@@ -3,15 +3,13 @@ package server.handler;
 import service.UserService;
 import io.javalin.http.Context;
 import model.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import dataaccess.BadRequestException;
-import dataaccess.UnauthorizedException;
-import dataaccess.ForbiddenException;
-import dataaccess.DataAccessException;
+import com.google.gson.*;
+import dataaccess.*;
+import java.util.Map;
 
 public class UserHandler {
     private final UserService userService;
+    private static final Gson gson = new Gson();
 
     public UserHandler(UserService userService) {
         this.userService = userService;
@@ -19,80 +17,53 @@ public class UserHandler {
 
     public void register(Context ctx) {
         try {
-            UserData userData = new Gson().fromJson(ctx.body(), UserData.class);
-
-            if (userData.username() == null || userData.password() == null) {
-                ctx.status(400).json(new ErrorResponse("Error: No username or password given"));
-                return;
-            }
-
-            AuthData authData = userService.register(userData);
-            ctx.status(200).json(new SuccessResponse("User registered successfully", authData));
-        } catch (ForbiddenException e) {
-            ctx.status(403).json(new ErrorResponse("Error: User already registered"));
+            UserData user = gson.fromJson(ctx.body(), UserData.class);
+            AuthData auth = userService.register(user);
+            ctx.status(200).json(Map.of(
+                    "username", auth.username(),
+                    "authToken", auth.authToken()
+            ));
         } catch (BadRequestException e) {
-            ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
+        } catch (ForbiddenException e) {
+            ctx.status(403).json(Map.of("message", "Error: already taken"));
         } catch (DataAccessException e) {
-            ctx.status(500).json(new ErrorResponse("Error: Internal server error during registration"));
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         } catch (JsonSyntaxException e) {
-            ctx.status(400).json(new ErrorResponse("Malformed JSON"));
-        } catch (Exception e) {
-            ctx.status(500).json(new ErrorResponse("Error: Internal server error"));
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
         }
     }
 
     public void login(Context ctx) {
         try {
-            UserData userData = new Gson().fromJson(ctx.body(), UserData.class);
-
-            if (userData.username() == null || userData.password() == null) {
-                ctx.status(400).json(new ErrorResponse("Error: No username or password given"));
+            UserData user = gson.fromJson(ctx.body(), UserData.class);
+            if (user == null || user.username() == null || user.username().isBlank()
+                || user.password() == null || user.password().isBlank()) {
+                ctx.status(400).json(Map.of("message", "Error: bad request"));
                 return;
             }
 
-            AuthData authData = userService.loginUser(userData);
-            ctx.status(200).json(new SuccessResponse("Login successful", authData));
-        } catch (UnauthorizedException e) {
-            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+            AuthData auth = userService.loginUser(user);
+            ctx.status(200).json(Map.of("username", auth.username(), "authToken", auth.authToken()));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: database error"));
         } catch (JsonSyntaxException e) {
-            ctx.status(400).json(new ErrorResponse("Malformed JSON"));
-        } catch (DataAccessException e) {
-            ctx.status(500).json(new ErrorResponse("Error: Internal server error during login"));
-        } catch (Exception e) {
-            ctx.status(500).json(new ErrorResponse("Error: Internal server error"));
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
         }
     }
 
-    public void logout(Context ctx) throws DataAccessException {
+    public void logout(Context ctx) {
         try {
-            String authToken = ctx.header("authorization");
-            if (authToken == null || authToken.isBlank()) {
-                throw new UnauthorizedException("missing auth token");
+            String token = ctx.header("authorization");
+            if (token == null || token.isBlank()) {
+                throw new UnauthorizedException("missing auth");
             }
-
-            userService.logoutUser(authToken);
-            ctx.status(200).json(new SuccessResponse("Logout successful", null));
-
+            userService.logoutUser(token);
+            ctx.status(200).json(Map.of());
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(new ErrorResponse("Error: unauthorized"));
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
         } catch (DataAccessException e) {
-            throw e;
-        }
-    }
-
-    private static class ErrorResponse {
-        public final String message;
-        public ErrorResponse(String message) {
-            this.message = message;
-        }
-    }
-
-    private static class SuccessResponse {
-        public final String message;
-        public final Object data;
-        public SuccessResponse(String message, Object data) {
-            this.message = message;
-            this.data = data;
+            ctx.status(500).json(Map.of("message", "Error: database error"));
         }
     }
 }

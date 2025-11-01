@@ -44,12 +44,21 @@ public class MySQLUserAccess implements UserAccess {
 
     @Override
     public void authenticateUser(String username, String password) throws DataAccessException {
-        UserData user = getUser(username);
-        if (user == null) {
-            throw new DataAccessException("User not found: " + username);
-        }
-        if (!BCrypt.checkpw(password, user.password())) {
-            throw new DataAccessException("Invalid password for: " + username);
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("SELECT password FROM user WHERE username = ?")) {
+
+            ps.setString(1, username);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String storedHash = rs.getString("password");
+                    if (BCrypt.checkpw(password, storedHash)) {
+                        return;
+                    }
+                }
+            }
+            throw new DataAccessException("bad credentials");
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error: " + e.getMessage());
         }
     }
 

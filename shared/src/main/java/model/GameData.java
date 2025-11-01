@@ -1,10 +1,15 @@
 package model;
 
-import chess.*;
+import chess.ChessGame;
 
-public record GameData(ChessGame game, int gameID, String gameName, 
-String whiteUsername, String blackUsername) {
+public record GameData(
+        ChessGame game,
+        int gameID,
+        String gameName,
+        String whiteUsername,
+        String blackUsername) {
+
     public GameData withGameName(String newGameName) {
-        return new GameData(this.game, this.gameID, newGameName, this.whiteUsername, this.blackUsername);
+        return new GameData(game, gameID, newGameName, whiteUsername, blackUsername);
     }
 }

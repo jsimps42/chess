@@ -1,50 +1,39 @@
 package dataaccess;
 
 import model.UserData;
-import java.util.HashSet;
 
-public class MemoryUserAccess implements UserAccess{
-    private HashSet<UserData> db;
-    public MemoryUserAccess() {
-        db = new HashSet<>(16);
-    }
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import org.mindrot.jbcrypt.BCrypt;
+
+public class MemoryUserAccess implements UserAccess {
+    private final Map<String, UserData> users = new HashMap<>();
 
     @Override
     public void addUser(UserData user) throws DataAccessException {
-        try {
-            getUser(user.username());
+        if (users.containsKey(user.username())) {
+            throw new DataAccessException("User already exists");
         }
-        catch (DataAccessException e) {
-            db.add(user);
-            return;
-        }
-
-        throw new DataAccessException("User already exists: " + user.username());
+        users.put(user.username(), user);
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        for (UserData user : db) {
-            if (user.username().equals(username)) {
-                return user;
-            }
-        }
-        throw new DataAccessException("User not found: " + username);
+        return users.get(username);
     }
 
     @Override
     public void authenticateUser(String username, String password) throws DataAccessException {
-        for (UserData user : db) {
-            if (user.username().equals(username) &&
-                user.password().equals(password)) {
-                return;
-            }
+        UserData user = users.get(username);
+        if (user == null || !BCrypt.checkpw(password, user.password())) {
+            throw new DataAccessException("bad credentials"); // ← Same as MySQL
         }
-        throw new DataAccessException("Could not access: " + username);
     }
 
     @Override
-    public void clear() {
-        db = new HashSet<>(16);
+    public void clear() throws DataAccessException {
+        users.clear();
     }
 }

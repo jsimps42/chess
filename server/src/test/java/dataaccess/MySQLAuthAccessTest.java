@@ -12,16 +12,16 @@ public class MySQLAuthAccessTest {
 
     @BeforeAll
     public static void setup() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        DatabaseManager.createTables();
         authAccess = new MySQLAuthAccess();
         userAccess = new MySQLUserAccess();
     }
 
     @BeforeEach
-    void init() throws DataAccessException {
-        authAccess.clear();
-        userAccess.clear();
+    public void clearAll() throws DataAccessException {  // ADD THIS
+        DatabaseManager.loadPropertiesFromResources();
+        DatabaseManager.createDatabase();
+        DatabaseManager.createTables();
+        new MySQLGameAccess().clear();
     }
 
     @Test

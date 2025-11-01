@@ -17,7 +17,10 @@ public class MySQLUserAccessTest {
 
     @BeforeEach
     public void clearBefore() throws DataAccessException {
-        userAccess.clear();
+        DatabaseManager.loadPropertiesFromResources();
+        DatabaseManager.createDatabase();
+        DatabaseManager.createTables();
+        new MySQLUserAccess().clear();
     }
 
     @Test
@@ -88,9 +91,8 @@ public class MySQLUserAccessTest {
         try {
             UserData newUser = new UserData("testUser", "password123", "testuser@example.com");
             userAccess.addUser(newUser);
-
             userAccess.authenticateUser("testUser", "password123");
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             fail("Exception should not be thrown during test execution: " + e.getMessage());
         }
     }
