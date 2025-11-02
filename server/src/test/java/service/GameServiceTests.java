@@ -4,10 +4,8 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import dataaccess.*;
 import model.*;
-import java.util.HashSet;
 import chess.ChessGame;
 
-//These are unit tests Tests tests Tests
 public class GameServiceTests {
     GameService gameService;
     GameAccess gameAccess;

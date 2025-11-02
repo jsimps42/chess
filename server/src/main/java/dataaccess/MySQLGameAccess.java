@@ -102,11 +102,23 @@ public class MySQLGameAccess implements GameAccess {
 
     @Override
     public void clear() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection();
-             var stmt = conn.createStatement()) {
-            stmt.executeUpdate("DELETE FROM game");
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to clear game table", e);
-        }
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'clear'");
     }
+    
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS  pet (
+                game TEXT NOT NULL,
+                gameID int NOT NULL AUTO_INCREMENT,
+                gameName VARCHAR(255) NOT NULL,
+                whiteUsername VARCHAR(255),
+                whiteUsername VARCHAR(255)               
+                PRIMARY KEY (gameID),
+                INDEX(gameName),
+                INDEX(whiteUsername)
+                INDEX(blackUsername)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
 }

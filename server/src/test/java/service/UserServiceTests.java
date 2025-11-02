@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import dataaccess.*;
 import model.*;
 
-//These are unit Tests tests Tests tests
 public class UserServiceTests {
     private UserService userService;
     UserAccess userAccess;

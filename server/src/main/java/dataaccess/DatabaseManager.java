@@ -3,7 +3,7 @@ package dataaccess;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.Properties;
-
+//delete this change
 public class DatabaseManager {
     private static boolean tablesCreated = false;
     private static final Object LOCK = new Object();

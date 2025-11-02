@@ -52,11 +52,17 @@ public class MySQLAuthAccess implements AuthAccess{
 
     @Override
     public void clear() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection();
-            var stmt = conn.createStatement()) {
-            stmt.executeUpdate("DELETE FROM auth");
-        } catch (SQLException ex) {
-            throw new DataAccessException("Failed to clear tables", ex);
-        }
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'clear'");
     }
+    
+    private final String[] createAuthAccess = {
+            """
+            CREATE TABLE IF NOT EXISTS auth (
+                authToken VARCHAR(255) NOT NULL,
+                username VARCHAR(255) NOT NULL,
+                PRIMARY KEY (authToken)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
 }

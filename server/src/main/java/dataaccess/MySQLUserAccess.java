@@ -57,11 +57,19 @@ public class MySQLUserAccess implements UserAccess{
 
     @Override
     public void clear() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection();
-             var stmt = conn.createStatement()) {
-            stmt.executeUpdate("DELETE FROM user");
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to clear user table", e);
-        }
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'clear'");
     }
+    
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS  user (
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                PRIMARY KEY (username),
+                INDEX(email)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
 }

@@ -10,8 +10,6 @@ import java.util.Set;
 
 import dataaccess.*;
 import model.GameData;
-import dataaccess.BadRequestException;
-import dataaccess.UnauthorizedException;
 
 public class GameHandler {
     private final GameService gameService;

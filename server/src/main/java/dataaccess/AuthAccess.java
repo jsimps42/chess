@@ -1,7 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
-
+//delete me
 public interface AuthAccess {
     void addAuth(AuthData authData) throws DataAccessException;
 

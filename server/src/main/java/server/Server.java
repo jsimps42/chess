@@ -8,6 +8,7 @@ import io.javalin.json.JavalinGson;
 import server.handler.*;
 import java.util.Map;
 import java.util.Properties;
+//delete this
 
 public class Server {
     UserAccess userAccess;
