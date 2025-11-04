@@ -34,7 +34,17 @@ public class MemoryUserAccess implements UserAccess {
     }
 
     @Override
-    public boolean authenticateUser(String username, String password) throws DataAccessException {
+    public UserData getUser(String username) throws DataAccessException {
+        for (UserData user : db) {
+            if (user.username().equals(username)) {
+                return user;
+            }
+        }
+        throw new DataAccessException("User not found: " + username);
+    }
+
+    @Override
+    public boolean authenticateUser(String username, String password) throws Exception {
         boolean userExists = false;
         for (UserData user : db) {
             if (user.username().equals(username)) {

@@ -18,8 +18,9 @@ public class UserHandler {
         this.userService = userService;
     }
 
-    public void register(Context ctx) throws BadRequestException {
-        UserData userData = ctx.bodyAsClass(UserData.class);
+    public void register(Context ctx) throws Exception {
+        try {
+            UserData userData = new Gson().fromJson(ctx.body(), UserData.class);
 
         if (userData.username() == null || userData.password() == null) {
             throw new BadRequestException("Missing username/password");
@@ -36,21 +37,29 @@ public class UserHandler {
         }
     }
 
-    public void login(Context ctx) throws UnauthorizedException, BadRequestException, DataAccessException {
-        UserData userData = ctx.bodyAsClass(UserData.class);
+    public void login(Context ctx) throws Exception {
+        try {
+            UserData userData = new Gson().fromJson(ctx.body(), UserData.class);
 
         if (userData == null || userData.username() == null || userData.password() == null) {
             throw new BadRequestException("Missing username/password");
         }
 
-        AuthData authData = userService.loginUser(userData);
-        ctx.status(HttpStatus.OK).json(authData);
+            AuthData authData = userService.loginUser(userData);
+            ctx.status(200).json(authData);
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+        } catch (JsonSyntaxException e) {
+            ctx.status(400).json(new ErrorResponse("Malformed JSON"));
+        } catch (Exception e) {
+            ctx.status(500).json(new ErrorResponse("Internal server error"));
+        }
     }
 
-    public void logout(Context ctx) throws UnauthorizedException, DataAccessException {
-        String authToken = ctx.header("authorization");
-
-        userService.logoutUser(authToken);
+    public void logout(Context ctx) throws Exception {
+        try {
+            String authToken = ctx.header("authorization");
+            userService.logoutUser(authToken);
 
         ctx.status(HttpStatus.OK).json(Map.of());
     }

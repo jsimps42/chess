@@ -4,15 +4,10 @@ import model.GameData;
 import java.util.HashSet;
 
 public interface GameAccess {
-    HashSet<GameData> listGames() throws DataAccessException;
-
-    void createGame(GameData game) throws DataAccessException;
-
-    GameData getGame(int gameID) throws DataAccessException;
-
-    boolean gameExists(int gameID);
-
-    void updateGame(GameData game) throws DataAccessException;
-
-    void clear() throws DataAccessException;
+    void createGame(GameData game) throws Exception;
+    GameData getGame(int gameID) throws Exception;
+    boolean gameExists(int gameID) throws Exception;
+    void updateGame(GameData game) throws Exception;
+    HashSet<GameData> listGames() throws Exception;
+    void clear() throws Exception;
 }

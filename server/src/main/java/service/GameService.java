@@ -20,7 +20,7 @@ public class GameService {
         this.authAccess = authAccess;
     }
 
-    public HashSet<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
+    public HashSet<GameData> listGames(String authToken) throws Exception {
         try {
             authAccess.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -29,45 +29,7 @@ public class GameService {
         return gameAccess.listGames();
     }
 
-    public GameData getGameData(String authToken, int gameID) throws UnauthorizedException, BadRequestException, DataAccessException {
-        try {
-            authAccess.getAuth(authToken);
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-
-        try {
-            return gameAccess.getGame(gameID);
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-    }
-
-    public void updateGame(String authToken, GameData gameData) throws UnauthorizedException, BadRequestException, DataAccessException {
-        try {
-            authAccess.getAuth(authToken);
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-
-        if (gameData == null) {
-            throw new BadRequestException("No game data");
-        }
-
-        try {
-            gameAccess.getGame(gameData.gameID());
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-
-        try {
-            gameAccess.updateGame(gameData);
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-    }
-
-    public int createGame(String authToken, String gameName) throws UnauthorizedException, BadRequestException, DataAccessException {
+    public int createGame(String authToken, String gameName) throws Exception {
         try {
             authAccess.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -101,8 +63,8 @@ public class GameService {
         return gameID;
     }
 
-    public void joinGame(String authToken, int gameID, String color)
-            throws UnauthorizedException, BadRequestException, ForbiddenException, DataAccessException {
+    public boolean joinGame(String authToken, int gameID, String color) throws Exception {
+
         AuthData authData;
         GameData gameData;
 
@@ -144,7 +106,7 @@ public class GameService {
         }
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws Exception {
         gameAccess.clear();
     }
 }

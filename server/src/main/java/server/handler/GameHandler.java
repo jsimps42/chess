@@ -18,7 +18,7 @@ public class GameHandler {
         this.gameService = gameService;
     }
 
-    public void listGames(Context ctx) throws UnauthorizedException, DataAccessException {
+    public void listGames(Context ctx) throws Exception {
         String authToken = ctx.header("authorization");
 
         record GameSummary(Integer gameID, String gameName, String whiteUsername, String blackUsername) {}
@@ -35,17 +35,32 @@ public class GameHandler {
         if (!ctx.body().contains("\"gameName\":")) {
             throw new BadRequestException("Missing gameName");
         }
-
-        GameData gameData = ctx.bodyAsClass(GameData.class);
-
-        String authToken = ctx.header("authorization");
-        int gameID = gameService.createGame(authToken, gameData.gameName());
-
-        record CreateGameResponse(Integer gameID) {}
-        ctx.status(HttpStatus.OK).json(new CreateGameResponse(gameID));
     }
 
-    public void joinGame(Context ctx) throws BadRequestException, UnauthorizedException, DataAccessException, ForbiddenException {
+    public void createGame(Context ctx) throws Exception {
+        String authToken = ctx.header("authorization");
+        try {
+            record CreateGameRequest(String gameName) {}
+            CreateGameRequest req = new Gson().fromJson(ctx.body(), CreateGameRequest.class);
+            String gameName = req.gameName();
+
+            if (gameName == null || gameName.trim().isEmpty()) {
+                ctx.status(400).json(Map.of("message", "Error: gameName is missing or empty"));
+                return;
+            }
+
+            int gameID = gameService.createGame(authToken, gameName);
+            ctx.status(200).json(Map.of("gameID", gameID));
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+        } catch (JsonSyntaxException e) {
+            ctx.status(400).json(Map.of("message", "Error: malformed JSON"));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        }
+    }
+
+    public void joinGame(Context ctx) throws Exception {
         if (!ctx.body().contains("\"gameID\":")) {
             throw new BadRequestException("Missing gameID");
         }
