@@ -23,8 +23,8 @@ public class GameService {
     public HashSet<GameData> listGames(String authToken) throws Exception {
         try {
             authAccess.getAuth(authToken);
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Data access error: " + e.getMessage());
+        } catch (Exception e) {
+            throw new UnauthorizedException();
         }
         return gameAccess.listGames();
     }

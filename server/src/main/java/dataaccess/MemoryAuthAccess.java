@@ -37,7 +37,7 @@ public class MemoryAuthAccess implements AuthAccess {
     }
 
     @Override
-    public void clear() {
-        db = HashSet.newHashSet(16);
+    public void clear() throws Exception {
+        db = new HashSet<>(16);
     }
 }
