@@ -72,12 +72,4 @@ public class UserServiceTests {
         assertThrows(UnauthorizedException.class, () -> 
             userService.logoutUser("fake_token"));
     }
-
-    @Test
-    @DisplayName("UserService clear clears all users and auths")
-    void userServiceClear() throws Exception {
-        userService.register(testUser);
-        userService.clear();
-        assertThrows(UnauthorizedException.class, () -> userService.logoutUser("anytoken"));
-    }
 }

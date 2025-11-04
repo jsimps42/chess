@@ -18,7 +18,7 @@ public class GameService {
     public HashSet<GameData> listGames(String authToken) throws Exception {
         try {
             authAccess.getAuth(authToken);
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             throw new UnauthorizedException();
         }
         return gameAccess.listGames();

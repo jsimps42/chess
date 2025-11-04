@@ -50,7 +50,7 @@ public class MemoryGameAccess implements GameAccess{
     }
 
     @Override
-    public void clear() {
+    public void clear() throws Exception {
         db = new HashSet<>(16);
     }
 }
