@@ -18,7 +18,7 @@ public class GameHandler {
         this.gameService = gameService;
     }
 
-    public void listGames(Context ctx) {
+    public void listGames(Context ctx) throws Exception {
         String authToken = ctx.header("authorization");
         try {
             HashSet<GameData> games = gameService.listGames(authToken);
@@ -28,7 +28,7 @@ public class GameHandler {
         }
     }
 
-    public void createGame(Context ctx) {
+    public void createGame(Context ctx) throws Exception {
         String authToken = ctx.header("authorization");
         try {
             record CreateGameRequest(String gameName) {}
@@ -51,7 +51,7 @@ public class GameHandler {
         }
     }
 
-    public void joinGame(Context ctx) {
+    public void joinGame(Context ctx) throws Exception {
         if (!ctx.body().contains("\"gameID\":")) {
             ctx.status(400).json(Map.of("message", "Error: No gameID provided"));
             return;

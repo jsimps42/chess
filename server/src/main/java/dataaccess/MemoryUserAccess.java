@@ -33,7 +33,7 @@ public class MemoryUserAccess implements UserAccess{
     }
 
     @Override
-    public boolean authenticateUser(String username, String password) throws DataAccessException {
+    public boolean authenticateUser(String username, String password) throws Exception {
         boolean userExists = false;
         for (UserData user : db) {
             if (user.username().equals(username)) {

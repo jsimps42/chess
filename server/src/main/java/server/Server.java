@@ -20,9 +20,15 @@ public class Server {
     private Javalin server;
 
     public Server() {
-        userAccess = new MemoryUserAccess();
-        authAccess = new MemoryAuthAccess();
-        gameAccess = new MemoryGameAccess();
+        try {
+            userAccess = new MySQLUserAccess();
+            authAccess = new MySQLAuthAccess();
+            gameAccess = new MySQLGameAccess();
+        } catch (Exception e) {
+            userAccess = new MemoryUserAccess();
+            authAccess = new MemoryAuthAccess();
+            gameAccess = new MemoryGameAccess();
+        }
         userService = new UserService(userAccess, authAccess);
         gameService = new GameService(gameAccess, authAccess);
         userHandler = new UserHandler(userService);
@@ -32,14 +38,13 @@ public class Server {
     public int run(int desiredPort) {
         server = Javalin.create(config -> {
             config.staticFiles.add("web");
-            config.jsonMapper(new JavalinGson()); // <-- Add this line here
+            config.jsonMapper(new JavalinGson());
         }).start(desiredPort);
 
         server.post("/user", userHandler::register);
         server.post("/session", userHandler::login);
         server.delete("/session", userHandler::logout);
         server.delete("/db", this::clear);
-        
         server.post("/game", gameHandler::createGame);
         server.get("/game", gameHandler::listGames);
         server.put("/game", gameHandler::joinGame);
@@ -57,7 +62,7 @@ public class Server {
         }
     }
 
-    private void clear(Context ctx) {
+    private void clear(Context ctx) throws Exception {
         gameService.clear();
         userService.clear();
         ctx.status(200).json("{}");

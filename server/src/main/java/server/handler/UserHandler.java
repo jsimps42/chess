@@ -16,7 +16,7 @@ public class UserHandler {
         this.userService = userService;
     }
 
-    public void register(Context ctx) {
+    public void register(Context ctx) throws Exception {
         try {
             UserData userData = new Gson().fromJson(ctx.body(), UserData.class);
 
@@ -36,7 +36,7 @@ public class UserHandler {
         }
     }
 
-    public void login(Context ctx) {
+    public void login(Context ctx) throws Exception {
         try {
             UserData userData = new Gson().fromJson(ctx.body(), UserData.class);
 
@@ -56,7 +56,7 @@ public class UserHandler {
         }
     }
 
-    public void logout(Context ctx) {
+    public void logout(Context ctx) throws Exception {
         try {
             String authToken = ctx.header("authorization");
             userService.logoutUser(authToken);
