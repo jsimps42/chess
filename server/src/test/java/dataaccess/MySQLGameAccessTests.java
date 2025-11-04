@@ -1,13 +1,20 @@
 package dataaccess;
 
 import model.GameData;
+import passoff.server.TestServer;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.HashSet;
+import passoff.server.TestServer;
+
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ExtendWith(TestServer.class)
 class MySQLGameAccessTests {
 
     private static MySQLGameAccess gameAccess;
@@ -74,7 +81,7 @@ class MySQLGameAccessTests {
     void gameExists_True() throws DataAccessException {
         GameData game = new GameData(defaultGame, 0, "Exists", null, null);
         gameAccess.createGame(game);
-        ints gameID = gameAccess.listGames().iterator().next().gameID();
+        int gameID = gameAccess.listGames().iterator().next().gameID();
         assertTrue(gameAccess.gameExists(gameID));
     }
 
@@ -92,7 +99,9 @@ class MySQLGameAccessTests {
         int gameID = gameAccess.listGames().iterator().next().gameID();
 
         ChessGame updatedChess = new ChessGame();
-        updatedChess.makeMove(...);
+        try {
+            updatedChess.makeMove(new ChessMove(new ChessPosition(1, 1), new ChessPosition(3, 1), null));
+        } catch (InvalidMoveException e) {}
         GameData updated = new GameData(updatedChess, gameID, "UpdateMe", "player1", "player2");
 
         assertDoesNotThrow(() -> gameAccess.updateGame(updated));

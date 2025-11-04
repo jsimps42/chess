@@ -2,9 +2,12 @@ package dataaccess;
 
 import model.AuthData;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.*;
+import passoff.server.TestServer;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ExtendWith(TestServer.class)
 class MySQLAuthAccessTests {
 
     private static MySQLAuthAccess authAccess;
@@ -13,6 +16,7 @@ class MySQLAuthAccessTests {
 
     @BeforeAll
     static void init() throws DataAccessException {
+        
         authAccess = new MySQLAuthAccess();
     }
 
