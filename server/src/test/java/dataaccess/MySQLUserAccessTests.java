@@ -27,7 +27,7 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("addUser - Positive: Successfully adds new user")
-    void addUser_Success() throws DataAccessException {
+    void addUserSuccess() throws DataAccessException {
         UserData user = new UserData("alice", "secret123", "alice@example.com");
         assertDoesNotThrow(() -> userAccess.addUser(user));
 
@@ -40,7 +40,7 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("addUser - Negative: Duplicate username throws DataAccessException")
-    void addUser_DuplicateUsername() throws DataAccessException {
+    void addUserDuplicateUsername() throws DataAccessException {
         UserData user = new UserData("bob", "pass123", "bob@example.com");
         userAccess.addUser(user);
 
@@ -50,7 +50,7 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("getUser - Positive: Returns existing user")
-    void getUser_Exists() throws DataAccessException {
+    void getUserExists() throws DataAccessException {
         UserData user = new UserData("charlie", "mypass", "c@example.com");
         userAccess.addUser(user);
 
@@ -62,14 +62,14 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("getUser - Negative: Returns null for non-existent user")
-    void getUser_NotExists() throws DataAccessException {
+    void getUserNotExists() throws DataAccessException {
         UserData found = userAccess.getUser("nonexistent");
         assertNull(found);
     }
 
     @Test
     @DisplayName("authenticateUser - Positive: Correct password returns true")
-    void authenticateUser_CorrectPassword() throws DataAccessException {
+    void authenticateUserCorrectPassword() throws DataAccessException {
         UserData user = new UserData("dave", "correcthorse", "dave@example.com");
         userAccess.addUser(user);
 
@@ -78,7 +78,7 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("authenticateUser - Negative: Wrong password returns false")
-    void authenticateUser_WrongPassword() throws DataAccessException {
+    void authenticateUserWrongPassword() throws DataAccessException {
         UserData user = new UserData("eve", "battery", "eve@example.com");
         userAccess.addUser(user);
 
@@ -87,13 +87,13 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("authenticateUser - Negative: Non-existent user returns false")
-    void authenticateUser_NonExistent() throws DataAccessException {
+    void authenticateUserNonExistent() throws DataAccessException {
         assertFalse(userAccess.authenticateUser("ghost", "anypass"));
     }
 
     @Test
     @DisplayName("clear - Positive: Removes all users")
-    void clear_RemovesAll() throws DataAccessException {
+    void clearRemovesAll() throws DataAccessException {
         userAccess.addUser(new UserData("user1", "p1", "u1@example.com"));
         userAccess.addUser(new UserData("user2", "p2", "u2@example.com"));
 

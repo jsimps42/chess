@@ -20,7 +20,9 @@ public class TestServer implements org.junit.jupiter.api.extension.BeforeAllCall
 
     @Override
     public void beforeAll(org.junit.jupiter.api.extension.ExtensionContext context) throws IOException {
-        if (javalinServer != null) return;
+        if (javalinServer != null) {
+            return;
+        }
 
         try (ServerSocket s = new ServerSocket(0)) {
             port = s.getLocalPort();
@@ -55,9 +57,5 @@ public class TestServer implements org.junit.jupiter.api.extension.BeforeAllCall
             }
         }
         throw new RuntimeException("Server did not become ready within 10 s");
-    }
-
-    public static String baseUrl() {
-        return "http://localhost:" + port;
     }
 }

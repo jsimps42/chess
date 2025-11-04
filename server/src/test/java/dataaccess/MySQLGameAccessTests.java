@@ -34,7 +34,7 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("createGame - Positive: Creates new game with auto-increment ID")
-    void createGame_Success() throws DataAccessException {
+    void createGameSuccess() throws DataAccessException {
         GameData game = new GameData(defaultGame, 0, "My Game", null, null);
         assertDoesNotThrow(() -> gameAccess.createGame(game));
 
@@ -48,7 +48,7 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("createGame - Negative: Duplicate gameName not enforced (allowed)")
-    void createGame_DuplicateName_Allowed() throws DataAccessException {
+    void createGameDuplicateNameAllowed() throws DataAccessException {
         GameData g1 = new GameData(defaultGame, 0, "Same", null, null);
         GameData g2 = new GameData(defaultGame, 0, "Same", null, null);
         gameAccess.createGame(g1);
@@ -57,7 +57,7 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("getGame - Positive: Returns correct game")
-    void getGame_Exists() throws DataAccessException {
+    void getGameExists() throws DataAccessException {
         GameData original = new GameData(defaultGame, 0, "TestGame", "white", "black");
         gameAccess.createGame(original);
 
@@ -72,13 +72,13 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("getGame - Negative: Returns null for invalid ID")
-    void getGame_NotExists() throws DataAccessException {
+    void getGameNotExists() throws DataAccessException {
         assertNull(gameAccess.getGame(999));
     }
 
     @Test
     @DisplayName("gameExists - Positive: Returns true for existing game")
-    void gameExists_True() throws DataAccessException {
+    void gameExistsTrue() throws DataAccessException {
         GameData game = new GameData(defaultGame, 0, "Exists", null, null);
         gameAccess.createGame(game);
         int gameID = gameAccess.listGames().iterator().next().gameID();
@@ -87,13 +87,13 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("gameExists - Negative: Returns false for non-existent")
-    void gameExists_False() throws DataAccessException {
+    void gameExistsFalse() throws DataAccessException {
         assertFalse(gameAccess.gameExists(999));
     }
 
     @Test
     @DisplayName("updateGame - Positive: Updates game state and players")
-    void updateGame_Success() throws DataAccessException {
+    void updateGameSuccess() throws DataAccessException {
         GameData original = new GameData(defaultGame, 0, "UpdateMe", null, null );
         gameAccess.createGame(original);
         int gameID = gameAccess.listGames().iterator().next().gameID();
@@ -114,7 +114,7 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("updateGame - Negative: Throws on invalid gameID")
-    void updateGame_InvalidID() {
+    void updateGameInvalidID() {
         ChessGame game = new ChessGame();
         GameData invalid = new GameData(game, 999, "Fake", "a", "b");
         assertThrows(DataAccessException.class, () -> gameAccess.updateGame(invalid));
@@ -122,7 +122,7 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("listGames - Positive: Returns all games")
-    void listGames_Multiple() throws DataAccessException {
+    void listGamesMultiple() throws DataAccessException {
         gameAccess.createGame(new GameData(defaultGame, 0, "Game1", null, null));
         gameAccess.createGame(new GameData(defaultGame, 0, "Game2", null, null));
 
@@ -134,14 +134,14 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("listGames - Negative: Empty list when none exist")
-    void listGames_Empty() throws DataAccessException {
+    void listGamesEmpty() throws DataAccessException {
         HashSet<GameData> games = gameAccess.listGames();
         assertTrue(games.isEmpty());
     }
 
     @Test
     @DisplayName("clear - Positive: Removes all games")
-    void clear_RemovesAll() throws DataAccessException {
+    void clearRemovesAll() throws DataAccessException {
         gameAccess.createGame(new GameData(defaultGame, 0, "Temp", null, null));
         assertFalse(gameAccess.listGames().isEmpty());
 
