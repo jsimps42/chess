@@ -8,7 +8,7 @@ import static dataaccess.MySQLHelper.configureDatabase;
 
 public class MySQLUserAccess implements UserAccess{
     private final String[] createUserStatement = {
-            """
+        """
             CREATE TABLE IF NOT EXISTS  user (
                 username VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
@@ -16,7 +16,7 @@ public class MySQLUserAccess implements UserAccess{
                 PRIMARY KEY (username),
                 INDEX(email)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
+        """
     };
 
     public MySQLUserAccess() throws DataAccessException {
