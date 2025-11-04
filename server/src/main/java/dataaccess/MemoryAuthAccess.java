@@ -13,6 +13,7 @@ public class MemoryAuthAccess implements AuthAccess {
 
     @Override
     public void addAuth(AuthData authData) throws Exception {
+    public void addAuth(AuthData authData) throws Exception {
         db.add(authData);
     }
 
