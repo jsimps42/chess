@@ -11,8 +11,8 @@ import passoff.server.TestServer;
 class MySQLAuthAccessTests {
 
     private static MySQLAuthAccess authAccess;
-    private static final String testToken = "auth-12345";
-    private static final String testUser = "testuser";
+    private static String testToken = "auth-12345";
+    private static String testUser = "testuser";
 
     @BeforeAll
     static void init() throws DataAccessException {
