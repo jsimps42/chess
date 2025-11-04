@@ -1,56 +1,60 @@
 package dataaccess;
 
+import dataaccess.DataAccessException;
 import model.GameData;
-import java.util.*;
+
+import java.util.HashSet;
 
 public class MemoryGameAccess implements GameAccess {
-    private final HashMap<Integer, GameData> db = new HashMap<>();
-    private int nextId = 1;
+    private HashSet<GameData> db;
+
+    public MemoryGameAccess() {
+        db = HashSet.newHashSet(16);
+    }
 
     @Override
-    public int createGame(GameData game) throws DataAccessException {
-        int id = nextId++;
-        GameData g = new GameData(
-                game.game(),
-                id,
-                game.gameName(),
-                game.whiteUsername(),
-                game.blackUsername()
-        );
-        db.put(id, g);
-        return id;
+    public HashSet<GameData> listGames() {
+        return db;
+    }
+
+    @Override
+    public void createGame(GameData game) throws DataAccessException {
+        db.add(game);
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        GameData g = db.get(gameID);
-        if (g == null) {
-            throw new DataAccessException("Game not found, id: " + gameID);
+        for (GameData game : db) {
+            if (game.gameID() == gameID) {
+                return game;
+            }
         }
-        return g;
+        throw new DataAccessException("Game does not exist: " + gameID);
     }
 
     @Override
-    public boolean gameExists(int gameID) throws DataAccessException {
-        return db.containsKey(gameID);
+    public boolean gameExists(int gameID) {
+        for (GameData game : db) {
+            if (game.gameID() == gameID) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        if (!db.containsKey(game.gameID())) {
-            throw new DataAccessException("Game not found, id: " + game.gameID());
+        try {
+            db.remove(getGame(game.gameID()));
+            db.add(game);
         }
-        db.put(game.gameID(), game);
+        catch (DataAccessException e) {
+            db.add(game);
+        }
     }
 
     @Override
-    public HashSet<GameData> listGames() throws DataAccessException {
-        return new HashSet<>(db.values());
-    }
-
-    @Override
-    public void clear() throws DataAccessException {
-        db.clear();
-        nextId = 1;
+    public void clear() {
+        db = HashSet.newHashSet(16);
     }
 }

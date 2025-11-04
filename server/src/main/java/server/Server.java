@@ -1,99 +1,95 @@
 package server;
 
 import dataaccess.*;
-import io.javalin.Javalin;
-import io.javalin.http.Context;
-import service.*;
-import io.javalin.json.JavalinGson;
 import server.handler.*;
+import io.javalin.*;
+import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
+import io.javalin.json.JavalinGson;
+import org.eclipse.jetty.websocket.api.Session;
+import service.GameService;
+import service.UserService;
+
 import java.util.Map;
-import java.util.Properties;
-//delete this
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
-    UserAccess userAccess;
-    AuthAccess authAccess;
-    GameAccess gameAccess;
-    UserService userService;
-    GameService gameService;
-    UserHandler userHandler;
-    GameHandler gameHandler;
+    private final Javalin javalin;
 
-    private Javalin server;
+    static UserService userService;
+    static GameService gameService;
+
+    private final UserHandler userHandler;
+    private final GameHandler gameHandler;
+
+    static ConcurrentHashMap<Session, Integer> gameSessions = new ConcurrentHashMap<>();
 
     public Server() throws DataAccessException{
         try {
+            UserAccess userAccess = new MySQLUserAccess();
+            AuthAccess authAccess = new MySQLAuthAccess();
+            GameAccess gameAccess = new MySQLGameAccess();
+
+            userService = new UserService(userAccess, authAccess);
+            gameService = new GameService(gameAccess, authAccess);
+
+            userHandler = new UserHandler(userService);
+            gameHandler = new GameHandler(gameService);
+
             DatabaseManager.createDatabase();
-            DatabaseManager.createTables();
-            System.out.println("Database and tables verified/created.");
         } catch (DataAccessException e) {
-            System.err.println("Failed to initialize database: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        userAccess = new MySQLUserAccess();
-        authAccess = new MySQLAuthAccess();
-        gameAccess = new MySQLGameAccess();
-        userService = new UserService(userAccess, authAccess);
-        gameService = new GameService(gameAccess, authAccess);
-        userHandler = new UserHandler(userService);
-        gameHandler = new GameHandler(gameService);
+        javalin = Javalin.create(config -> {
+            config.staticFiles.add("web");
+            config.jsonMapper(new JavalinGson());
+        });
+
+        javalin.delete("/db", this::clear);
+
+        javalin.post("/user", userHandler::register);
+        javalin.post("/session", userHandler::login);
+        javalin.delete("/session", userHandler::logout);
+
+        javalin.get("/game", gameHandler::listGames);
+        javalin.post("/game", gameHandler::createGame);
+        javalin.put("/game", gameHandler::joinGame);
+
+        javalin.exception(BadRequestException.class, (e, ctx) -> {
+            ctx.status(HttpStatus.BAD_REQUEST).result("{ \"message\": \"Error: bad request\" }");
+        });
+        javalin.exception(UnauthorizedException.class, (e, ctx) -> {
+            ctx.status(HttpStatus.UNAUTHORIZED).result("{ \"message\": \"Error: unauthorized\" }");
+        });
+        javalin.exception(ForbiddenException.class, (e, ctx) -> {
+            ctx.status(HttpStatus.FORBIDDEN).result("{ \"message\": \"Error: forbidden\" }");
+        });
+        javalin.exception(DataAccessException.class, (e, ctx) -> {
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).result("{ \"message\": \"Error: data access\" }");
+        });
+        javalin.exception(Exception.class, (e, ctx) -> {
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).result("{ \"message\": \"Error: %s\" }".formatted(e.getMessage()));
+        });
     }
 
     public int run(int desiredPort) {
-        server = Javalin.create(config -> {
-            config.staticFiles.add("web");
-            config.jsonMapper(new JavalinGson());
-        }).start(desiredPort);
-
-        server.post("/user", userHandler::register);
-        server.post("/session", userHandler::login);
-        server.delete("/session", userHandler::logout);
-        server.delete("/db", ctx -> {
-            System.out.println("CLEAR /db CALLED");
-            try {
-                System.out.println("Clearing users...");
-                userService.clear();
-                System.out.println("Users cleared");
-                System.out.println("Clearing games...");
-                gameService.clear();
-                System.out.println("Games cleared");
-                DatabaseManager.resetTablesCreated();
-                ctx.status(200).json(Map.of());
-            } catch (Exception e) {
-                System.out.println("EXCEPTION IN /db: " + e.getClass().getName() + ": " + e.getMessage());
-                e.printStackTrace();
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
-            }
-        });
-        server.post("/game", gameHandler::createGame);
-        server.get("/game", gameHandler::listGames);
-        server.put("/game", gameHandler::joinGame);
-
-        server.exception(BadRequestException.class, (e, ctx) -> {
-            ctx.status(400).json(new ErrorResponse("Error: bad request"));
-        });
-        server.exception(Exception.class, (e, ctx) -> {
-            ctx.status(500).json(new ErrorResponse("Internal server error"));
-        });
-
-        return server.port();
+        javalin.start(desiredPort);
+        return javalin.port();
     }
 
     public void stop() {
-        if (server != null) {
-            server.stop();
-        }
+        javalin.stop();
     }
 
-    private static class ErrorResponse {
-        public final String message;
-        public ErrorResponse(String message) { 
-            this.message = message; 
-        }
-    }
+    private void clear(Context ctx) {
+        try {
+            userService.clear();
+            gameService.clear();
 
-    public static void loadProperties(Properties props) {
-        DatabaseManager.loadProperties(props);
+            ctx.status(HttpStatus.OK).json(Map.of());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

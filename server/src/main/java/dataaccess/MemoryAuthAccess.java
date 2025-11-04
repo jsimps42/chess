@@ -1,33 +1,43 @@
 package dataaccess;
 
 import model.AuthData;
+
 import java.util.HashSet;
 
 public class MemoryAuthAccess implements AuthAccess {
-    private final HashSet<AuthData> db = new HashSet<>(16);
+    private HashSet<AuthData> db;
 
-    @Override
-    public void addAuth(AuthData auth) throws DataAccessException {
-        db.add(auth);
+    public MemoryAuthAccess() {
+        db = HashSet.newHashSet(16);
     }
 
     @Override
-    public AuthData getAuth(String token) {
-        for (AuthData a : db) {
-            if (a.authToken().equals(token)) {
-                return a;
+    public void addAuth(AuthData authData) {
+        db.add(authData);
+    }
+
+    @Override
+    public void deleteAuth(String authToken) {
+        for (AuthData authData : db) {
+            if (authData.authToken().equals(authToken)) {
+                db.remove(authData);
+                break;
             }
         }
-        return null;
     }
 
     @Override
-    public void deleteAuth(String token) throws DataAccessException {
-        db.removeIf(a -> a.authToken().equals(token));
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        for (AuthData authData : db) {
+            if (authData.authToken().equals(authToken)) {
+                return authData;
+            }
+        }
+        throw new DataAccessException("Auth token does not exist: " + authToken);
     }
 
     @Override
     public void clear() {
-        db.clear();
+        db = HashSet.newHashSet(16);
     }
 }

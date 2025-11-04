@@ -1,9 +1,13 @@
 package service;
 
 import dataaccess.*;
-import model.*;
+import dataaccess.BadRequestException;
+import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
+import model.AuthData;
+import model.UserData;
 
-//delete this
+import java.util.UUID;
 
 public class UserService {
     private final UserAccess userAccess;
@@ -14,34 +18,30 @@ public class UserService {
         this.authAccess = authAccess;
     }
 
-    public AuthData register(UserData user) throws BadRequestException, ForbiddenException, DataAccessException {
-        if (user == null ||
-            user.username() == null || user.username().isEmpty() ||
-            user.password() == null || user.password().isEmpty() ||
-            user.email() == null || user.email().isEmpty()) {
-            throw new BadRequestException("Missing required registration fields");
+    public AuthData createUser(UserData userData) throws BadRequestException, DataAccessException {
+        try {
+            userAccess.addUser(userData);
+        } catch (DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
         }
-        if (userAccess.getUser(user.username()) != null) {
-            throw new ForbiddenException("already taken");
-        }
-        userAccess.addUser(user);
-        String token = AuthData.generateToken();
-        AuthData auth = new AuthData(token, user.username());
-        authAccess.addAuth(auth);
-        return auth;
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, userData.username());
+        authAccess.addAuth(authData);
+
+        return authData;
     }
 
     public AuthData loginUser(UserData userData) throws UnauthorizedException, DataAccessException {
-        boolean userAuth = false;
+        boolean userAuthenticated;
         try {
-            userAuth = userAccess.authenticateUser(userData.username(), userData.password());
+            userAuthenticated = userAccess.authenticateUser(userData.username(), userData.password());
         } catch (DataAccessException e) {
-            throw new UnauthorizedException();
+            throw new DataAccessException(e.getMessage());
         }
 
-        if (userAuth) {
-            String authToken = AuthData.generateToken();
-            AuthData authData = new AuthData(authToken,userData.username());
+        if (userAuthenticated) {
+            String authToken = UUID.randomUUID().toString();
+            AuthData authData = new AuthData(authToken, userData.username());
             authAccess.addAuth(authData);
             return authData;
         } else {
@@ -49,17 +49,24 @@ public class UserService {
         }
     }
 
-
-    public void logoutUser(String authToken) throws UnauthorizedException, DataAccessException{
+    public void logoutUser(String authToken) throws UnauthorizedException, DataAccessException {
         try {
             authAccess.getAuth(authToken);
         } catch (DataAccessException e) {
-            throw new UnauthorizedException();
+            throw new DataAccessException(e.getMessage());
         }
         authAccess.deleteAuth(authToken);
     }
 
-    public void clear() throws DataAccessException{
+    public AuthData getAuth(String authToken) throws UnauthorizedException, DataAccessException {
+        try {
+            return authAccess.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    public void clear() throws DataAccessException {
         userAccess.clear();
         authAccess.clear();
     }

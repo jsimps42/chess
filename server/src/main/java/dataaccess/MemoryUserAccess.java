@@ -2,38 +2,58 @@ package dataaccess;
 
 import model.UserData;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-
-import org.mindrot.jbcrypt.BCrypt;
 
 public class MemoryUserAccess implements UserAccess {
-    private final Map<String, UserData> users = new HashMap<>();
+    private HashSet<UserData> db;
 
-    @Override
-    public void addUser(UserData user) throws DataAccessException {
-        if (users.containsKey(user.username())) {
-            throw new DataAccessException("User already exists");
-        }
-        users.put(user.username(), user);
+    public MemoryUserAccess() {
+        db = HashSet.newHashSet(16);
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        return users.get(username);
+        for (UserData user : db) {
+            if (user.username().equals(username)) {
+                return user;
+            }
+        }
+        throw new DataAccessException("User does not exist: " + username);
     }
 
     @Override
-    public void authenticateUser(String username, String password) throws DataAccessException {
-        UserData user = users.get(username);
-        if (user == null || !BCrypt.checkpw(password, user.password())) {
-            throw new DataAccessException("bad credentials"); // ← Same as MySQL
+    public void addUser(UserData user) throws DataAccessException {
+        try {
+            getUser(user.username());
+        }
+        catch (DataAccessException e) {
+            db.add(user);
+            return;
+        }
+        throw new DataAccessException("User already exists: " + user.username());
+    }
+
+    @Override
+    public boolean authenticateUser(String username, String password) throws DataAccessException {
+        boolean userExists = false;
+        for (UserData user : db) {
+            if (user.username().equals(username)) {
+                userExists = true;
+            }
+            if (user.username().equals(username) &&
+                user.password().equals(password)) {
+                return true;
+            }
+        }
+        if (userExists) {
+            return false;
+        } else {
+            throw new DataAccessException("User not found: " + username);
         }
     }
 
     @Override
-    public void clear() throws DataAccessException {
-        users.clear();
+    public void clear() {
+        db = HashSet.newHashSet(16);
     }
 }
