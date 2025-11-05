@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import model.GameData;
 import dataaccess.BadRequestException;
+import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 
 public class GameHandler {
@@ -25,6 +26,10 @@ public class GameHandler {
             ctx.status(200).json(Map.of("games", games));
         } catch (UnauthorizedException e) {
             ctx.status(401).json(Map.of("message", "Error: Unauthorized"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
 
@@ -44,7 +49,9 @@ public class GameHandler {
             ctx.status(200).json(Map.of("gameID", gameID));
         } catch (UnauthorizedException e) {
             ctx.status(401).json(Map.of("message", "Error: unauthorized"));
-        } catch (JsonSyntaxException e) {
+        }catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        } catch (BadRequestException e) {
             ctx.status(400).json(Map.of("message", "Error: malformed JSON"));
         } catch (Exception e) {
             ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
@@ -70,6 +77,10 @@ public class GameHandler {
             ctx.status(401).json(Map.of("message", "Error: unauthorized"));
         } catch (BadRequestException e) {
             ctx.status(400).json(Map.of("message", "Error: bad request"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
 }

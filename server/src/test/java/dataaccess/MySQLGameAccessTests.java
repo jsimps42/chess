@@ -28,14 +28,14 @@ class MySQLGameAccessTests {
 
     @BeforeEach
     @AfterEach
-    void clear() throws DataAccessException {
+    void clear() throws Exception {
         gameAccess.clear();
     }
 
     @Test
-    @DisplayName("createGame - Positive: Creates new game with auto-increment ID")
-    void createGameSuccess() throws DataAccessException {
-        GameData game = new GameData(defaultGame, 0, "My Game", null, null);
+    @DisplayName("createGame - Positive: creates game")
+    void createGameSuccess() throws Exception {
+        GameData game = new GameData(defaultGame, 42, "My Game", null, null);
         assertDoesNotThrow(() -> gameAccess.createGame(game));
 
         HashSet<GameData> games = gameAccess.listGames();
@@ -47,17 +47,17 @@ class MySQLGameAccessTests {
     }
 
     @Test
-    @DisplayName("createGame - Negative: Duplicate gameName not enforced (allowed)")
-    void createGameDuplicateNameAllowed() throws DataAccessException {
-        GameData g1 = new GameData(defaultGame, 0, "Same", null, null);
-        GameData g2 = new GameData(defaultGame, 0, "Same", null, null);
+    @DisplayName("createGame - Negative: Duplicate gameID throws exception")
+    void createGameForceUniqueID() throws Exception {
+        GameData g1 = new GameData(defaultGame, 1, "Same", null, null);
+        GameData g2 = new GameData(defaultGame, 1, "Different", null, null);
         gameAccess.createGame(g1);
-        assertDoesNotThrow(() -> gameAccess.createGame(g2));
+        assertThrows(DataAccessException.class, () -> gameAccess.createGame(g2));
     }
 
     @Test
     @DisplayName("getGame - Positive: Returns correct game")
-    void getGameExists() throws DataAccessException {
+    void getGameExists() throws Exception {
         GameData original = new GameData(defaultGame, 0, "TestGame", "white", "black");
         gameAccess.createGame(original);
 
@@ -72,13 +72,13 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("getGame - Negative: Returns null for invalid ID")
-    void getGameNotExists() throws DataAccessException {
+    void getGameNotExists() throws Exception {
         assertNull(gameAccess.getGame(999));
     }
 
     @Test
     @DisplayName("gameExists - Positive: Returns true for existing game")
-    void gameExistsTrue() throws DataAccessException {
+    void gameExistsTrue() throws Exception {
         GameData game = new GameData(defaultGame, 0, "Exists", null, null);
         gameAccess.createGame(game);
         int gameID = gameAccess.listGames().iterator().next().gameID();
@@ -87,20 +87,20 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("gameExists - Negative: Returns false for non-existent")
-    void gameExistsFalse() throws DataAccessException {
+    void gameExistsFalse() throws Exception {
         assertFalse(gameAccess.gameExists(999));
     }
 
     @Test
     @DisplayName("updateGame - Positive: Updates game state and players")
-    void updateGameSuccess() throws DataAccessException {
+    void updateGameSuccess() throws Exception {
         GameData original = new GameData(defaultGame, 0, "UpdateMe", null, null );
         gameAccess.createGame(original);
         int gameID = gameAccess.listGames().iterator().next().gameID();
 
         ChessGame updatedChess = new ChessGame();
         try {
-            updatedChess.makeMove(new ChessMove(new ChessPosition(1, 1), new ChessPosition(3, 1), null));
+            updatedChess.makeMove(new ChessMove(new ChessPosition(2, 2), new ChessPosition(4, 2), null));
         } catch (InvalidMoveException e) {}
         GameData updated = new GameData(updatedChess, gameID, "UpdateMe", "player1", "player2");
 
@@ -122,9 +122,9 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("listGames - Positive: Returns all games")
-    void listGamesMultiple() throws DataAccessException {
-        gameAccess.createGame(new GameData(defaultGame, 0, "Game1", null, null));
-        gameAccess.createGame(new GameData(defaultGame, 0, "Game2", null, null));
+    void listGamesMultiple() throws Exception {
+        gameAccess.createGame(new GameData(defaultGame, 1, "Game1", null, null));
+        gameAccess.createGame(new GameData(defaultGame, 2, "Game2", null, null));
 
         HashSet<GameData> games = gameAccess.listGames();
         assertEquals(2, games.size());
@@ -134,14 +134,14 @@ class MySQLGameAccessTests {
 
     @Test
     @DisplayName("listGames - Negative: Empty list when none exist")
-    void listGamesEmpty() throws DataAccessException {
+    void listGamesEmpty() throws Exception {
         HashSet<GameData> games = gameAccess.listGames();
         assertTrue(games.isEmpty());
     }
 
     @Test
     @DisplayName("clear - Positive: Removes all games")
-    void clearRemovesAll() throws DataAccessException {
+    void clearRemovesAll() throws Exception {
         gameAccess.createGame(new GameData(defaultGame, 0, "Temp", null, null));
         assertFalse(gameAccess.listGames().isEmpty());
 

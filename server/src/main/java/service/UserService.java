@@ -14,21 +14,14 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws Exception {
-        if (user == null ||
-            user.username() == null || user.username().isEmpty() ||
-            user.password() == null || user.password().isEmpty() ||
-            user.email() == null || user.email().isEmpty()) {
-            throw new BadRequestException("Missing required registration fields");
+        if (user == null || user.username() == null ||
+          user.password() == null || user.email() == null) {
+            throw new BadRequestException("Error: Missing required registration fields");
         }
-
-        try {
-            userAccess.addUser(user);
-        } catch (DataAccessException e) {
-            if (e.getMessage().contains("already exists")) {
-                throw new ForbiddenException("User already registered");
-            }
-            throw new BadRequestException(e.getMessage());
+        if (userAccess.getUser(user.username()) != null) {
+                throw new ForbiddenException("Error: User already registered");
         }
+        userAccess.addUser(user);
         String authToken = AuthData.generateToken();
         AuthData authData = new AuthData(authToken, user.username());
         authAccess.addAuth(authData);
@@ -37,12 +30,12 @@ public class UserService {
     }
 
     public AuthData loginUser(UserData userData) throws Exception {
-        boolean userAuth = false;
-        try {
-            userAuth = userAccess.authenticateUser(userData.username(), userData.password());
-        } catch (DataAccessException e) {
-            throw new UnauthorizedException();
+        if (userData.username() == null || userData.password() == null) {
+            throw new BadRequestException("Error: bad request");
         }
+        
+        boolean userAuth = false;
+        userAuth = userAccess.authenticateUser(userData.username(), userData.password());
 
         if (userAuth) {
             String authToken = AuthData.generateToken();
@@ -56,9 +49,7 @@ public class UserService {
 
 
     public void logoutUser(String authToken) throws Exception {
-        try {
-            authAccess.getAuth(authToken);
-        } catch (DataAccessException e) {
+        if (authAccess.getAuth(authToken) == null) {
             throw new UnauthorizedException();
         }
         authAccess.deleteAuth(authToken);

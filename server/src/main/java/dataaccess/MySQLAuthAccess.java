@@ -35,7 +35,7 @@ public class MySQLAuthAccess implements AuthAccess {
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return new AuthData(
-                          rs.getString(authToken), 
+                          rs.getString("authToken"), 
                           rs.getString("username")
                         );
                     }
@@ -50,7 +50,7 @@ public class MySQLAuthAccess implements AuthAccess {
     @Override
     public void deleteAuth(String authToken) throws Exception {
         try {
-            String statement = "DELETE FROM auth WHERE token=?";
+            String statement = "DELETE FROM auth WHERE authToken=?";
             executeUpdate(statement, authToken);
         } catch (Exception e) {
             throw new DataAccessException(String.format("Error deleting auth: %s", e));

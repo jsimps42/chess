@@ -20,7 +20,7 @@ public class MemoryAuthAccess implements AuthAccess {
                 return authData;
             }
         }
-        throw new DataAccessException("Auth Token does not exist: " + authToken);
+        throw new DataAccessException("Error: Auth Token does not exist: " + authToken);
     }
 
     @Override

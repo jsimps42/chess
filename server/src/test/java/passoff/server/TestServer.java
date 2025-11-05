@@ -1,6 +1,6 @@
 package passoff.server;
 
-import server.Server;                     // <-- your production Server
+import server.Server;
 import java.io.IOException;
 import java.net.ServerSocket;
 

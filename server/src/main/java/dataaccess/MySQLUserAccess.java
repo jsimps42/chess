@@ -24,14 +24,14 @@ public class MySQLUserAccess implements UserAccess{
     }
 
     @Override
-    public void addUser(UserData user) throws DataAccessException {
+    public void addUser(UserData user) throws Exception {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         executeUpdate(statement, user.username(), hashedPassword, user.email());
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) throws Exception {
         try (Connection conn = DatabaseManager.getConnection()) {
             var statement = "SELECT username, password, email FROM user WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -39,7 +39,7 @@ public class MySQLUserAccess implements UserAccess{
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return new UserData(
-                          rs.getString(username), 
+                          rs.getString("username"), 
                           rs.getString("password"), 
                           rs.getString("email")
                         );
@@ -53,8 +53,11 @@ public class MySQLUserAccess implements UserAccess{
     }
 
     @Override
-    public boolean authenticateUser(String username, String password) throws DataAccessException {
+    public boolean authenticateUser(String username, String password) throws Exception {
         UserData userData = getUser(username);
+        if (userData == null) {
+            return false;
+        }
         return BCrypt.checkpw(password, userData.password());
     }
 

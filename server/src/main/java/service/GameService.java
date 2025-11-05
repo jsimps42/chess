@@ -16,21 +16,14 @@ public class GameService {
     }
 
     public HashSet<GameData> listGames(String authToken) throws Exception {
-        try {
-            authAccess.getAuth(authToken);
-        } catch (Exception e) {
+        if (authAccess.getAuth(authToken) == null) {
             throw new UnauthorizedException();
         }
         return gameAccess.listGames();
     }
 
     public int createGame(String authToken, String gameName) throws Exception {
-        try {
-            authAccess.getAuth(authToken);
-        } catch (DataAccessException e) {
-            throw new UnauthorizedException();
-        }
-
+        authAccess.getAuth(authToken);
         Random rand = new Random();
         int gameID;
         do {
@@ -46,18 +39,12 @@ public class GameService {
 
         AuthData authData;
         GameData gameData;
-
-        try {
-            authData = authAccess.getAuth(authToken);
-        } catch (DataAccessException e) {
+        authData = authAccess.getAuth(authToken);
+        if (authData == null) {
             throw new UnauthorizedException();
         }
-
-        try {
-            gameData = gameAccess.getGame(gameID);
-        } catch (DataAccessException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+        
+        gameData = gameAccess.getGame(gameID);
 
         String whiteUser = gameData.whiteUsername();
         String blackUser = gameData.blackUsername();
@@ -77,7 +64,7 @@ public class GameService {
         } else if (color == null || color.isEmpty()) {
             throw new BadRequestException("Error: Player color cannot be null or empty");
         } else {
-            throw new BadRequestException("%s is not a valid team color".formatted(color));
+            throw new BadRequestException("Error: %s is not a valid team color".formatted(color));
         }
         gameAccess.updateGame(new GameData(gameData.game(), gameID, gameData.gameName(), whiteUser, blackUser));
         return true;

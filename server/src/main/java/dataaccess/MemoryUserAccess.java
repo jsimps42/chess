@@ -10,7 +10,7 @@ public class MemoryUserAccess implements UserAccess{
     }
 
     @Override
-    public void addUser(UserData user) throws DataAccessException {
+    public void addUser(UserData user) throws BadRequestException {
         try {
             getUser(user.username());
         }
@@ -19,7 +19,7 @@ public class MemoryUserAccess implements UserAccess{
             return;
         }
 
-        throw new DataAccessException("User already exists: " + user.username());
+        throw new BadRequestException("Error: User already exists: " + user.username());
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MemoryUserAccess implements UserAccess{
                 return user;
             }
         }
-        throw new DataAccessException("User not found: " + username);
+        throw new DataAccessException("Error: User not found: " + username);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MemoryUserAccess implements UserAccess{
             return false;
         }
         else {
-            throw new DataAccessException("User does not exist: " + username);
+            throw new DataAccessException("Error: User does not exist: " + username);
         }
     }
 

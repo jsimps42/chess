@@ -27,7 +27,7 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("addUser - Positive: Successfully adds new user")
-    void addUserSuccess() throws DataAccessException {
+    void addUserSuccess() throws Exception {
         UserData user = new UserData("alice", "secret123", "alice@example.com");
         assertDoesNotThrow(() -> userAccess.addUser(user));
 
@@ -40,7 +40,7 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("addUser - Negative: Duplicate username throws DataAccessException")
-    void addUserDuplicateUsername() throws DataAccessException {
+    void addUserDuplicateUsername() throws Exception {
         UserData user = new UserData("bob", "pass123", "bob@example.com");
         userAccess.addUser(user);
 
@@ -50,7 +50,7 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("getUser - Positive: Returns existing user")
-    void getUserExists() throws DataAccessException {
+    void getUserExists() throws Exception {
         UserData user = new UserData("charlie", "mypass", "c@example.com");
         userAccess.addUser(user);
 
@@ -62,14 +62,14 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("getUser - Negative: Returns null for non-existent user")
-    void getUserNotExists() throws DataAccessException {
+    void getUserNotExists() throws Exception {
         UserData found = userAccess.getUser("nonexistent");
         assertNull(found);
     }
 
     @Test
     @DisplayName("authenticateUser - Positive: Correct password returns true")
-    void authenticateUserCorrectPassword() throws DataAccessException {
+    void authenticateUserCorrectPassword() throws Exception {
         UserData user = new UserData("dave", "correcthorse", "dave@example.com");
         userAccess.addUser(user);
 
@@ -78,7 +78,7 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("authenticateUser - Negative: Wrong password returns false")
-    void authenticateUserWrongPassword() throws DataAccessException {
+    void authenticateUserWrongPassword() throws Exception {
         UserData user = new UserData("eve", "battery", "eve@example.com");
         userAccess.addUser(user);
 
@@ -87,13 +87,13 @@ class MySQLUserAccessTests {
 
     @Test
     @DisplayName("authenticateUser - Negative: Non-existent user returns false")
-    void authenticateUserNonExistent() throws DataAccessException {
+    void authenticateUserNonExistent() throws Exception {
         assertFalse(userAccess.authenticateUser("ghost", "anypass"));
     }
 
     @Test
     @DisplayName("clear - Positive: Removes all users")
-    void clearRemovesAll() throws DataAccessException {
+    void clearRemovesAll() throws Exception {
         userAccess.addUser(new UserData("user1", "p1", "u1@example.com"));
         userAccess.addUser(new UserData("user2", "p2", "u2@example.com"));
 

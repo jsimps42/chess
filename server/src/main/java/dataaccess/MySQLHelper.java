@@ -20,8 +20,8 @@ public class MySQLHelper {
                 }
                 return ps.executeUpdate();
             }
-        } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException(String.format("Unable to update database: %s", e.getMessage()));
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Error: Unable to update database: %s", e.getMessage()));
         }
     }
 
@@ -33,8 +33,8 @@ public class MySQLHelper {
                     preparedStatement.executeUpdate();
                 }
             }
-        } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", e.getMessage()));
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Error: Unable to configure database: %s", e.getMessage()));
         }
     }
 }

@@ -21,7 +21,7 @@ public class MemoryGameAccess implements GameAccess{
                 return game;
             }
         }
-        throw new DataAccessException("Game not found, id: " +gameID);
+        throw new DataAccessException("Error: Game not found, id: " +gameID);
     }
 
     @Override
