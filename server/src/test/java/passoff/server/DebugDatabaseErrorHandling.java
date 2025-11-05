@@ -78,7 +78,9 @@ public class DebugDatabaseErrorHandling {
 
     private String readResponseBody(HttpURLConnection conn) throws IOException {
         InputStream stream = conn.getResponseCode() >= 400 ? conn.getErrorStream() : conn.getInputStream();
-        if (stream == null) return "";
+        if (stream == null) {
+            return "";
+        }
         try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             return br.lines().collect(java.util.stream.Collectors.joining());
         }
