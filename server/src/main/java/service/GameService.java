@@ -23,7 +23,9 @@ public class GameService {
     }
 
     public int createGame(String authToken, String gameName) throws Exception {
-        authAccess.getAuth(authToken);
+        if (authAccess.getAuth(authToken) == null) {
+            throw new UnauthorizedException();
+        }        
         Random rand = new Random();
         int gameID;
         do {
@@ -43,7 +45,7 @@ public class GameService {
         if (authData == null) {
             throw new UnauthorizedException();
         }
-        
+
         gameData = gameAccess.getGame(gameID);
 
         String whiteUser = gameData.whiteUsername();
