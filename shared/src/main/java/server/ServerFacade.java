@@ -8,6 +8,7 @@ import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.HashSet;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -15,6 +16,34 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
+    }
+
+    public void register(String username, String password, String email) throws Exception {
+        throw new UnsupportedOperationException("Not Implemented");
+    }
+
+    public void login(String username, String password) throws Exception {
+        throw new UnsupportedOperationException("Not Implemented");
+    }
+
+    public void logout(String authToken) throws Exception {
+        throw new UnsupportedOperationException("Not Implemented");
+    }
+
+    public void createGame(GameData game) throws Exception {
+        throw new UnsupportedOperationException("Not Implemented");
+    }
+
+    public HashSet<GameData> listGames(String authToken) throws Exception {
+        throw new UnsupportedOperationException("Not Implemented");
+    }
+
+    public void joinGame(String authToken, int GameID, String color) throws Exception {
+        throw new UnsupportedOperationException("Not Implemented");
+    }
+
+    public void clear(String authToken) throws Exception {
+        throw new UnsupportedOperationException("Not Implemented");
     }
 
     private HttpRequest buildRequest(String method, String path, Object body) {
