@@ -118,7 +118,7 @@ public class ChessClient {
         if (params.length >= 2) {
             int gameID = Integer.parseInt(params[0]);
             String teamColor = params[1];
-            server.joinGame(gameID, teamColor, username);
+            server.joinGame(gameID, teamColor);
             return String.format("You joined game %s as %s.", gameID, teamColor);
         }
         throw new Exception("Expected: <ID> <WHITE|BLACK>");

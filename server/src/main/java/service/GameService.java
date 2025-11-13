@@ -38,7 +38,6 @@ public class GameService {
     }
 
     public boolean joinGame(String authToken, int gameID, String color) throws Exception {
-
         AuthData authData;
         GameData gameData;
         authData = authAccess.getAuth(authToken);

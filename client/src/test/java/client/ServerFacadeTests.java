@@ -156,7 +156,7 @@ public class ServerFacadeTests {
         GamesList list = serverFacade.listGames();
         int gameID = list.games().iterator().next().gameID();
 
-        assertDoesNotThrow(() -> serverFacade.joinGame(gameID, "WHITE", "joiner"));
+        assertDoesNotThrow(() -> serverFacade.joinGame(gameID, "WHITE"));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class ServerFacadeTests {
     void joinGameInvalidIDFails() throws Exception {
         serverFacade.register("badjoin", "pass", "bj@chess.com");
         ResponseException ex = assertThrows(ResponseException.class, () ->
-                serverFacade.joinGame(9999, "WHITE", "badjoin"));
+                serverFacade.joinGame(9999, "WHITE"));
         assertEquals(400, ex.getStatusCode());
     }
 
@@ -174,13 +174,13 @@ public class ServerFacadeTests {
         serverFacade.register("p1", "pass", "p1@chess.com");
         serverFacade.createGame(new GameData(null, 0, "Test Game", null, null));
         int gameID = serverFacade.listGames().games().iterator().next().gameID();
-        serverFacade.joinGame(gameID, "WHITE", "p1");
+        serverFacade.joinGame(gameID, "WHITE");
 
         serverFacade.logout();
         serverFacade.register("p2", "pass", "p2@chess.com");
 
         ResponseException ex = assertThrows(ResponseException.class, () ->
-                serverFacade.joinGame(gameID, "WHITE", "p2"));
+          serverFacade.joinGame(gameID, "WHITE"));
         assertEquals(403, ex.getStatusCode());
     }
 

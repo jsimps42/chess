@@ -57,8 +57,8 @@ public class ServerFacade {
         return wrapper == null ? new GamesList() : new GamesList(wrapper.games());
     }
 
-    public void joinGame(int gameID, String color, String username) throws Exception {
-        var request = buildRequest("PUT", "/game", new joinGameRequest(gameID, color));
+    public void joinGame(int gameID, String color) throws Exception {
+        var request = buildRequest("PUT", "/game", new joinGameRequest(color, gameID));
         var response = sendRequest(request);
         handleResponse(response, null);
     }
@@ -132,8 +132,8 @@ public class ServerFacade {
     }
 
     private record joinGameRequest(
-     @SerializedName("gameID") int gameID,
-     @SerializedName("teamColor") String teamColor
+      @SerializedName("playerColor") String teamColor,
+      @SerializedName("gameID") int gameID
     ) {
     }
 }
