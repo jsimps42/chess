@@ -30,7 +30,7 @@ public class ServerFacade {
     }
 
     public AuthData login(String username, String password) throws Exception {
-        var request = buildRequest("POST", "/session", new loginRequest(username, password));
+        var request = buildRequest("POST", "/session", new LoginRequest(username, password));
         var response = sendRequest(request);
         AuthData auth = handleResponse(response, AuthData.class);
         this.authToken = auth.authToken();
@@ -58,7 +58,7 @@ public class ServerFacade {
     }
 
     public void joinGame(int gameID, String color) throws Exception {
-        var request = buildRequest("PUT", "/game", new joinGameRequest(color, gameID));
+        var request = buildRequest("PUT", "/game", new JoinGameRequest(color, gameID));
         var response = sendRequest(request);
         handleResponse(response, null);
     }
@@ -127,11 +127,11 @@ public class ServerFacade {
         return status / 100 == 2;
     }
 
-    private record loginRequest(String username, String password) {
+    private record LoginRequest(String username, String password) {
 
     }
 
-    private record joinGameRequest(
+    private record JoinGameRequest(
       @SerializedName("playerColor") String teamColor,
       @SerializedName("gameID") int gameID
     ) {
