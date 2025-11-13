@@ -2,12 +2,7 @@ package server;
 
 import dataaccess.*;
 import io.javalin.Javalin;
-import io.javalin.http.Context;
 import service.*;
-
-import java.io.IOException;
-
-import com.google.gson.Gson;
 import io.javalin.json.JavalinGson;
 import server.handler.*;
 

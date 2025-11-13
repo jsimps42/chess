@@ -4,7 +4,6 @@ import service.UserService;
 import io.javalin.http.Context;
 import model.*;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mindrot.jbcrypt.BCrypt;
 import static org.junit.jupiter.api.Assertions.*;
-import passoff.server.TestServer;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(TestServer.class)

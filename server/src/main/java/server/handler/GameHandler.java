@@ -2,9 +2,6 @@ package server.handler;
 
 import service.GameService;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.annotations.SerializedName;
-
 import io.javalin.http.Context;
 import java.util.HashSet;
 import java.util.Map;
