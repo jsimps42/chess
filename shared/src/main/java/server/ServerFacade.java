@@ -19,31 +19,45 @@ public class ServerFacade {
     }
 
     public void register(String username, String password, String email) throws Exception {
-        throw new UnsupportedOperationException("Not Implemented");
+        var request = buildRequest("POST", "/user", new UserData(username, password, email));
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public void login(String username, String password) throws Exception {
-        throw new UnsupportedOperationException("Not Implemented");
+        var request = buildRequest("POST", "/session", new loginRequest(username, password));
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public void logout(String authToken) throws Exception {
-        throw new UnsupportedOperationException("Not Implemented");
+        var request = buildRequest("DELETE", "/session", authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public void createGame(GameData game) throws Exception {
-        throw new UnsupportedOperationException("Not Implemented");
+        var request = buildRequest("POST", "/game", game);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public HashSet<GameData> listGames(String authToken) throws Exception {
-        throw new UnsupportedOperationException("Not Implemented");
+        var request = buildRequest("GET", "/game", null);
+        var response = sendRequest(request);
+        return handleResponse(response, GamesList.class);
     }
 
     public void joinGame(String authToken, int GameID, String color) throws Exception {
-        throw new UnsupportedOperationException("Not Implemented");
+        var request = buildRequest("PUT", "/game", new joinGameRequest(authToken, GameID, color));
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public void clear(String authToken) throws Exception {
-        throw new UnsupportedOperationException("Not Implemented");
+        var request = buildRequest("DELETE", "/db", null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body) {
@@ -92,5 +106,13 @@ public class ServerFacade {
 
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
+    }
+
+    private record loginRequest(String username, String password) {
+
+    }
+
+    private record joinGameRequest(String authToken, int gameID, String teamColor) {
+
     }
 }
