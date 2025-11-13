@@ -7,24 +7,10 @@ import java.util.Map;
 
 public class ResponseException extends Exception {
 
-    public enum Code {
-        ServerError,
-        ClientError,
-    }
+    public enum Code { ServerError, ClientError }
 
-    final private Code code;
+    private final Code code;
     private final int httpStatus;
-
-    public ResponseException(Code code, String message) {
-        super(message);
-        this.code = code;
-        if (code == Code.ServerError) {
-            httpStatus = 500;
-        }
-        else {
-            httpStatus = 400;
-        }
-    }
 
     public ResponseException(Code code, String message, int httpStatus) {
         super(message);
@@ -32,23 +18,46 @@ public class ResponseException extends Exception {
         this.httpStatus = httpStatus;
     }
 
-    public int getStatusCode() { 
-        return httpStatus; 
+    public ResponseException(Code code, String message) {
+        this(code, message, code == Code.ServerError ? 500 : 400);
     }
+
+    public int getStatusCode() { return httpStatus; }
 
     public String toJson() {
         return new Gson().toJson(Map.of("message", getMessage(), "status", code));
     }
 
-    public static ResponseException fromJson(String json) {
-        var map = new Gson().fromJson(json, HashMap.class);
-        var status = Code.valueOf(map.get("status").toString());
-        String message = map.get("message").toString();
-        return new ResponseException(status, message);
+    public static ResponseException fromJson(String json, int httpStatus) {
+        try {
+            var map = new Gson().fromJson(json, HashMap.class);
+            if (map == null) {
+                return new ResponseException(Code.ClientError, "Empty error body", httpStatus);
+            }
+
+            Code code = Code.ClientError;
+            Object statusObj = map.get("status");
+            if (statusObj instanceof String statusStr) {
+                try { code = Code.valueOf(statusStr); }
+                catch (IllegalArgumentException ignored) {}
+            }
+
+            String message = "Server error";
+            Object msgObj = map.get("message");
+            if (msgObj instanceof String msgStr) {
+                message = msgStr;
+            } else if (msgObj != null) {
+                message = msgObj.toString();
+            }
+
+            return new ResponseException(code, message, httpStatus);
+        } catch (Exception e) {
+            return new ResponseException(Code.ClientError, "Failed to parse error: " + json, httpStatus);
+        }
     }
 
-    public Code code() {
-        return code;
+    public static ResponseException fromJson(String json) {
+        return fromJson(json, 400);
     }
 
     public static Code fromHttpStatusCode(int httpStatusCode) {

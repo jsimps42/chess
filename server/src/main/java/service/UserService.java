@@ -19,7 +19,7 @@ public class UserService {
             throw new BadRequestException("Error: Missing required registration fields");
         }
         if (userAccess.getUser(user.username()) != null) {
-                throw new ForbiddenException("Error: User already registered");
+            throw new ForbiddenException("Error: User already registered");
         }
         userAccess.addUser(user);
         String authToken = AuthData.generateToken();

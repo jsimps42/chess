@@ -54,8 +54,7 @@ public class ServerFacadeTests {
         serverFacade.register("duplicate", "pass", "d@up.com");
 
         ResponseException exception = assertThrows(ResponseException.class, () ->
-                serverFacade.register("duplicate", "newpass", "other@email.com"));
-
+          serverFacade.register("duplicate", "newpass", "other@email.com"));
         assertEquals(403, exception.getStatusCode());
     }
 
