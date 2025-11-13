@@ -47,6 +47,9 @@ public class GameService {
         }
 
         gameData = gameAccess.getGame(gameID);
+        if (gameData == null) {
+            throw new BadRequestException("Error: GameID doesn't exist");
+        }
 
         String whiteUser = gameData.whiteUsername();
         String blackUser = gameData.blackUsername();

@@ -15,13 +15,13 @@ public class MemoryGameAccess implements GameAccess{
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGame(int gameID) {
         for (GameData game : db) {
             if (game.gameID() == gameID) {
                 return game;
             }
         }
-        throw new DataAccessException("Error: Game not found, id: " +gameID);
+        return null;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MemoryGameAccess implements GameAccess{
         try {
             db.remove(getGame(game.gameID()));
             db.add(game);
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             db.add(game);
         }
     }

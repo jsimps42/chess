@@ -10,26 +10,21 @@ public class MemoryUserAccess implements UserAccess{
     }
 
     @Override
-    public void addUser(UserData user) throws BadRequestException {
-        try {
-            getUser(user.username());
-        }
-        catch (DataAccessException e) {
+    public void addUser(UserData user) {
+        if (getUser(user.username()) == null) {
             db.add(user);
             return;
         }
-
-        throw new BadRequestException("Error: User already exists: " + user.username());
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) {
         for (UserData user : db) {
             if (user.username().equals(username)) {
                 return user;
             }
         }
-        throw new DataAccessException("Error: User not found: " + username);
+        return null;
     }
 
     @Override

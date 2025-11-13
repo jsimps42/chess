@@ -14,13 +14,13 @@ public class MemoryAuthAccess implements AuthAccess {
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) {
         for (AuthData authData : db) {
             if (authData.authToken().equals(authToken)) {
                 return authData;
             }
         }
-        throw new DataAccessException("Error: Auth Token does not exist: " + authToken);
+        return null;
     }
 
     @Override
