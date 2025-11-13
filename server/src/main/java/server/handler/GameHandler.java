@@ -96,4 +96,28 @@ public class GameHandler {
             ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
+
+    public void observeGame(Context ctx) throws Exception {
+        String authToken = ctx.header("authorization");
+        int gameID;
+        try {
+            gameID = Integer.parseInt(ctx.pathParam("gameID"));
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(Map.of("message", "Error: invalid gameID"));
+            return;
+        }
+
+        try {
+            GameData game = gameService.getGame(authToken, gameID);
+            if (game == null) {
+                ctx.status(400).json(Map.of("message", "Error: game not found"));
+                return;
+            }
+            ctx.status(200).json(game);
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        }
+    }
 }

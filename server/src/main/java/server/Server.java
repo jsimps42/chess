@@ -50,6 +50,7 @@ public class Server {
         server.delete("/db", clearHandler::clear);
         server.post("/game", gameHandler::createGame);
         server.get("/game", gameHandler::listGames);
+        server.get("/game/{gameID}", gameHandler::observeGame);
         server.put("/game", gameHandler::joinGame);
 
         server.exception(BadRequestException.class, (e, ctx) -> ctx.status(400).json(new ErrorResponse("Error: bad request")));

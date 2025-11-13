@@ -199,7 +199,7 @@ public class ServerFacadeTests {
     void observeGameInvalidIDFails() throws Exception {
         serverFacade.register("badobs", "pass", "bo@chess.com");
         ResponseException ex = assertThrows(ResponseException.class, () ->
-                serverFacade.observeGame(9999));
+          serverFacade.observeGame(9999));
         assertEquals(400, ex.getStatusCode());
     }
 

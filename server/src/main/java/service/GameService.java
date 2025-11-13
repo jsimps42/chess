@@ -78,4 +78,12 @@ public class GameService {
     public void clear() throws Exception {
         gameAccess.clear();
     }
+
+    public GameData getGame(String authToken, int gameID) throws Exception {
+        AuthData auth = authAccess.getAuth(authToken);
+        if (auth == null) {
+            throw new UnauthorizedException();
+        }
+        return gameAccess.getGame(gameID);
+    }
 }

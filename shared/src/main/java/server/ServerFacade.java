@@ -64,7 +64,7 @@ public class ServerFacade {
     }
 
     public void observeGame(int gameID) throws Exception {
-        var request = buildRequest("GET", "/game", gameID);
+        var request = buildRequest("GET", "/game/" + gameID, null);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
