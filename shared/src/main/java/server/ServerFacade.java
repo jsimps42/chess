@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import model.*;
+import model.GamesList.GamesListResponse;
 import exception.ResponseException;
 import java.net.*;
 import java.net.http.*;
@@ -50,7 +51,8 @@ public class ServerFacade {
     public GamesList listGames() throws Exception {
         var request = buildRequest("GET", "/game", null);
         var response = sendRequest(request);
-        return handleResponse(response, GamesList.class);
+        GamesListResponse wrapper = handleResponse(response, GamesListResponse.class);
+        return wrapper == null ? new GamesList() : new GamesList(wrapper.games());
     }
 
     public void joinGame(int GameID, String color, String username) throws Exception {

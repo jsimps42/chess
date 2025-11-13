@@ -25,4 +25,7 @@ public class GamesList extends HashSet<GameData> {
     public String toJson() {
         return new Gson().toJson(Map.of("games", this));
     }
+
+    public record GamesListResponse(Collection<GameData> games) {
+    }
 }
