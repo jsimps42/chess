@@ -8,7 +8,6 @@ import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.HashSet;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -18,16 +17,16 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public void register(String username, String password, String email) throws Exception {
+    public AuthData register(String username, String password, String email) throws Exception {
         var request = buildRequest("POST", "/user", new UserData(username, password, email));
         var response = sendRequest(request);
-        handleResponse(response, null);
+        return handleResponse(response, AuthData.class);
     }
 
-    public void login(String username, String password) throws Exception {
+    public AuthData login(String username, String password) throws Exception {
         var request = buildRequest("POST", "/session", new loginRequest(username, password));
         var response = sendRequest(request);
-        handleResponse(response, null);
+        return handleResponse(response, AuthData.class);
     }
 
     public void logout() throws Exception {
