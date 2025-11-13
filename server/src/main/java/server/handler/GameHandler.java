@@ -3,6 +3,8 @@ package server.handler;
 import service.GameService;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
+
 import io.javalin.http.Context;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,16 +61,29 @@ public class GameHandler {
     }
 
     public void joinGame(Context ctx) throws Exception {
-        if (!ctx.body().contains("\"gameID\":")) {
-            ctx.status(400).json(Map.of("message", "Error: No gameID provided"));
+        String authToken = ctx.header("authorization");
+
+        record JoinGameRequest(
+         @SerializedName("gameID") int gameID,
+         @SerializedName("teamColor") String teamColor
+        ) {}
+
+        JoinGameRequest request;
+        try {
+            request = new Gson().fromJson(ctx.body(), JoinGameRequest.class);
+        } catch (JsonSyntaxException e) {
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
             return;
         }
-        String authToken = ctx.header("authorization");
-        record JoinGameData(String playerColor, int gameID) {}
-        JoinGameData joinData = new Gson().fromJson(ctx.body(), JoinGameData.class);
+
+        if (request.teamColor() == null || request.teamColor().trim().isEmpty()) {
+            ctx.status(400).json(Map.of("message", "Error: teamColor is missing"));
+            return;
+        }
+
         try {
-            boolean joinSuccess = gameService.joinGame(authToken, joinData.gameID(), joinData.playerColor());
-            if (!joinSuccess) {
+            boolean success = gameService.joinGame(authToken, request.gameID(), request.teamColor());
+            if (!success) {
                 ctx.status(403).json(Map.of("message", "Error: already taken"));
                 return;
             }
@@ -76,10 +91,8 @@ public class GameHandler {
         } catch (UnauthorizedException e) {
             ctx.status(401).json(Map.of("message", "Error: unauthorized"));
         } catch (BadRequestException e) {
-            ctx.status(400).json(Map.of("message", "Error: bad request"));
+            ctx.status(400).json(Map.of("message", "Error: " + e.getMessage()));
         } catch (DataAccessException e) {
-            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
-        } catch (Exception e) {
             ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }

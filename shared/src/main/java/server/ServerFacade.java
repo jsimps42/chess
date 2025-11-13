@@ -1,6 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
+
 import model.*;
 import model.GamesList.GamesListResponse;
 import exception.ResponseException;
@@ -55,8 +57,8 @@ public class ServerFacade {
         return wrapper == null ? new GamesList() : new GamesList(wrapper.games());
     }
 
-    public void joinGame(int GameID, String color, String username) throws Exception {
-        var request = buildRequest("PUT", "/game", new joinGameRequest(GameID, color, username));
+    public void joinGame(int gameID, String color, String username) throws Exception {
+        var request = buildRequest("PUT", "/game", new joinGameRequest(gameID, color));
         var response = sendRequest(request);
         handleResponse(response, null);
     }
@@ -129,7 +131,9 @@ public class ServerFacade {
 
     }
 
-    private record joinGameRequest(int gameID, String teamColor, String username) {
-
+    private record joinGameRequest(
+     @SerializedName("gameID") int gameID,
+     @SerializedName("teamColor") String teamColor
+    ) {
     }
 }
