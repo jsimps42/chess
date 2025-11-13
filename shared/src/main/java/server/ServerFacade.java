@@ -30,8 +30,8 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public void logout(String authToken) throws Exception {
-        var request = buildRequest("DELETE", "/session", authToken);
+    public void logout() throws Exception {
+        var request = buildRequest("DELETE", "/session", null);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
@@ -42,19 +42,25 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public HashSet<GameData> listGames(String authToken) throws Exception {
+    public GamesList listGames() throws Exception {
         var request = buildRequest("GET", "/game", null);
         var response = sendRequest(request);
         return handleResponse(response, GamesList.class);
     }
 
-    public void joinGame(String authToken, int GameID, String color) throws Exception {
-        var request = buildRequest("PUT", "/game", new joinGameRequest(authToken, GameID, color));
+    public void joinGame(int GameID, String color, String username) throws Exception {
+        var request = buildRequest("PUT", "/game", new joinGameRequest(GameID, color, username));
         var response = sendRequest(request);
         handleResponse(response, null);
     }
 
-    public void clear(String authToken) throws Exception {
+    public void observeGame(int gameID) throws Exception {
+        var request = buildRequest("GET", "/game", gameID);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
+    public void clear() throws Exception {
         var request = buildRequest("DELETE", "/db", null);
         var response = sendRequest(request);
         handleResponse(response, null);
@@ -112,7 +118,7 @@ public class ServerFacade {
 
     }
 
-    private record joinGameRequest(String authToken, int gameID, String teamColor) {
+    private record joinGameRequest(int gameID, String teamColor, String username) {
 
     }
 }
