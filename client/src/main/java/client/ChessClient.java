@@ -74,7 +74,7 @@ public class ChessClient {
     }
 
     public String register(String... params) throws Exception {
-        if (params.length >= 3) {
+        if (params.length == 3) {
             String username = params[0];
             String password = params[1];
             String email = params[2];
@@ -87,7 +87,7 @@ public class ChessClient {
     }
 
     public String login(String... params) throws Exception {
-        if (params.length >= 2) {
+        if (params.length == 2) {
             String username = params[0];
             String password = params[1];
             server.login(username, password);
@@ -100,7 +100,7 @@ public class ChessClient {
 
     public String createGame(String... params) throws Exception {
         assertSignedIn();
-        if (params.length >= 1) {
+        if (params.length == 1) {
             String gameName = params[0];
             server.createGame(new GameData(new ChessGame(), 0, gameName, null, null));
             return String.format("Game \"%s\" successfully created.", gameName);
@@ -142,7 +142,7 @@ public class ChessClient {
 
     public String joinGame(String... params) throws Exception {
         assertSignedIn();
-        if (params.length < 1) {
+        if (params.length != 2) {
             throw new Exception("Expected: join <ID> [WHITE|BLACK]");
         }
 
@@ -158,7 +158,7 @@ public class ChessClient {
             throw new Exception("Invalid game ID – use 'list' to see available games");
         }
 
-        String requestedColor = params.length >= 2 ? params[1].toUpperCase() : null;
+        String requestedColor = params.length == 2 ? params[1].toUpperCase() : null;
 
         String white = game.whiteUsername();
         String black = game.blackUsername();
@@ -206,7 +206,7 @@ public class ChessClient {
             }
         }
 
-        ChessBoardUI.drawBoard(game.game(), perspective);
+        ChessBoardUI.drawBoard(new ChessGame(), perspective);
 
         if (chosenColor != null) {
             if (alreadyInGame) {
@@ -221,7 +221,7 @@ public class ChessClient {
 
     public String observeGame(String... params) throws Exception {
         assertSignedIn();
-        if (params.length < 1) {
+        if (params.length != 1) {
             throw new Exception("Expected: <ID>");
         }
 
