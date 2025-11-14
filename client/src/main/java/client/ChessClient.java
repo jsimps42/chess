@@ -1,26 +1,32 @@
 package client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
-import com.google.gson.Gson;
 import chess.ChessGame;
+import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
+import ui.ChessBoardUI;
 
 import static ui.EscapeSequences.*;
 
 public class ChessClient {
-    
+
     private String username = null;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
+    private final Map<Integer, GameData> gameIDsMap = new HashMap<>();
 
     public ChessClient(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
     }
 
     public void run() {
-        System.out.println(LOGO + " ♕ Welcome to chess. Sign in to start.");
+        System.out.println(LOGO + " Welcome to chess. Sign in to start.");
         System.out.println(help());
 
         Scanner scanner = new Scanner(System.in);
@@ -34,7 +40,7 @@ public class ChessClient {
                 System.out.println(BLUE + result);
             } catch (Throwable e) {
                 var msg = e.toString();
-                System.out.println(msg);
+                System.out.println(RED + msg);
             }
         }
 
@@ -63,17 +69,18 @@ public class ChessClient {
                 default -> help();
             };
         } catch (Exception ex) {
-            return ex.getMessage();
+            return RED + ex.getMessage();
         }
     }
 
     public String register(String... params) throws Exception {
         if (params.length >= 3) {
-            state = State.SIGNEDIN;
-            this.username = params[0];
+            String username = params[0];
             String password = params[1];
             String email = params[2];
             server.register(username, password, email);
+            this.username = username;
+            state = State.SIGNEDIN;
             return String.format("Registration complete. Successfully signed in as \"%s\".", username);
         }
         throw new Exception("Expected: <USERNAME> <PASSWORD> <EMAIL>");
@@ -81,10 +88,11 @@ public class ChessClient {
 
     public String login(String... params) throws Exception {
         if (params.length >= 2) {
-            state = State.SIGNEDIN;
-            this.username = params[0];
+            String username = params[0];
             String password = params[1];
             server.login(username, password);
+            this.username = username;
+            state = State.SIGNEDIN;
             return String.format("Successfully signed in as \"%s\".", username);
         }
         throw new Exception("Expected: <USERNAME> <PASSWORD>");
@@ -103,33 +111,135 @@ public class ChessClient {
     public String listGames() throws Exception {
         assertSignedIn();
         GamesList gameList = server.listGames();
-        var result = new StringBuilder();
-        var gson = new Gson();
-        for (GameData game : gameList) {
-            result.append(gson.toJson(game)).append('\n');
+        List<GameData> games = new ArrayList<>(gameList.games());
+        gameIDsMap.clear();
+
+        System.out.println(SET_TEXT_COLOR_BLUE + "=== Active Games ===" + RESET);
+
+        if (games.isEmpty()) {
+            System.out.println(SET_TEXT_COLOR_YELLOW + "No games available." + RESET);
+            return "Listed 0 games.";
         }
-        return result.toString();
+
+        for (int i = 0; i < games.size(); i++) {
+            GameData game = games.get(i);
+            int displayNumber = i + 1;
+
+            gameIDsMap.put(displayNumber, game);
+
+            String white = game.whiteUsername() != null ? game.whiteUsername() : "(empty)";
+            String black = game.blackUsername() != null ? game.blackUsername() : "(empty)";
+
+            System.out.printf("%s%d.%s \"%s\" — White: %s%s%s, Black: %s%s%s%n",
+                    SET_TEXT_BOLD, displayNumber, RESET,
+                    game.gameName(),
+                    SET_TEXT_COLOR_BLUE, white, RESET,
+                    SET_TEXT_COLOR_RED, black, RESET);
+        }
+
+        return String.format("Listed %d game%s.", games.size(), games.size() == 1 ? "" : "s");
     }
 
     public String joinGame(String... params) throws Exception {
         assertSignedIn();
-        if (params.length >= 2) {
-            int gameID = Integer.parseInt(params[0]);
-            String teamColor = params[1];
-            server.joinGame(gameID, teamColor);
-            return String.format("You joined game %s as %s.", gameID, teamColor);
+        if (params.length < 1) {
+            throw new Exception("Expected: join <ID> [WHITE|BLACK]");
         }
-        throw new Exception("Expected: <ID> <WHITE|BLACK>");
+
+        int displayNumber;
+        try {
+            displayNumber = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            throw new Exception("Invalid ID – refer to list and select a game ID");
+        }
+
+        GameData game = gameIDsMap.get(displayNumber);
+        if (game == null) {
+            throw new Exception("Invalid game ID – use 'list' to see available games");
+        }
+
+        String requestedColor = params.length >= 2 ? params[1].toUpperCase() : null;
+
+        String white = game.whiteUsername();
+        String black = game.blackUsername();
+        boolean isWhite = username != null && username.equals(white);
+        boolean isBlack = username != null && username.equals(black);
+        boolean alreadyInGame = isWhite || isBlack;
+
+        String chosenColor = null;
+        ChessGame.TeamColor perspective = ChessGame.TeamColor.WHITE;
+
+        if (requestedColor != null) {
+            if (!List.of("WHITE", "BLACK").contains(requestedColor)) {
+                throw new Exception("Color must be WHITE or BLACK");
+            }
+
+            boolean spotTaken = (requestedColor.equals("WHITE") && white != null && !isWhite) ||
+              (requestedColor.equals("BLACK") && black != null && !isBlack);
+
+            if (spotTaken) {
+                throw new Exception("That color is already taken by another player");
+            }
+
+            chosenColor = requestedColor;
+            perspective = requestedColor.equals("BLACK") 
+              ? ChessGame.TeamColor.BLACK 
+              : ChessGame.TeamColor.WHITE;
+        } else {
+            if (alreadyInGame) {
+                chosenColor = isWhite ? "WHITE" : "BLACK";
+                perspective = isWhite ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            } else {
+                chosenColor = null;
+                perspective = ChessGame.TeamColor.WHITE;
+            }
+        }
+
+        if (chosenColor != null) {
+            try {
+                server.joinGame(game.gameID(), chosenColor);
+            } catch (ResponseException e) {
+                if (e.getMessage().contains("already taken") && alreadyInGame) {
+                } else {
+                    throw e;
+                }
+            }
+        }
+
+        ChessBoardUI.drawBoard(game.game(), perspective);
+
+        if (chosenColor != null) {
+            if (alreadyInGame) {
+                return String.format("Rejoined game \"%s\" as %s", game.gameName(), chosenColor);
+            } else {
+                return String.format("Joined game \"%s\" as %s", game.gameName(), chosenColor);
+            }
+        } else {
+            return String.format("Now observing game \"%s\"", game.gameName());
+        }
     }
 
     public String observeGame(String... params) throws Exception {
         assertSignedIn();
-        if (params.length >= 1) {
-            int gameID = Integer.parseInt(params[0]);
-            server.observeGame(gameID);
-            return String.format("You are observing game %s.", gameID);
+        if (params.length < 1) {
+            throw new Exception("Expected: <ID>");
         }
-        throw new Exception("Expected: <ID>");
+
+        int displayNumber;
+        try {
+            displayNumber = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            throw new Exception("Invalid ID – refer to list and select a game ID");
+        }
+
+        GameData game = gameIDsMap.get(displayNumber);
+        if (game == null) {
+            throw new Exception("Invalid ID – refer to list and select a game ID");
+        }
+
+        server.observeGame(game.gameID());
+        ChessBoardUI.drawBoard(new ChessGame(), ChessGame.TeamColor.WHITE);
+        return String.format("You are now observing game \"%s\".", game.gameName());
     }
 
     public String logout() throws Exception {
@@ -166,7 +276,7 @@ public class ChessClient {
             throw new Exception("You must be signed in to run that command");
         }
     }
-    
+
     public enum State {
         SIGNEDOUT,
         SIGNEDIN

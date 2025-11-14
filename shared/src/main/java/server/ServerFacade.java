@@ -11,6 +11,8 @@ import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -117,7 +119,15 @@ public class ServerFacade {
         }
 
         if (responseClass != null) {
-            return new Gson().fromJson(response.body(), responseClass);
+            String body = response.body();
+            if (body == null || body.isBlank()) {
+                throw new ResponseException(ResponseException.Code.ServerError, "Empty response body");
+            }
+            T result = new Gson().fromJson(body, responseClass);
+            if (result == null) {
+                throw new ResponseException(ResponseException.Code.ServerError, "Failed to deserialize: " + body);
+            }
+            return result;
         }
 
         return null;

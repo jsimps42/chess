@@ -52,18 +52,25 @@ public class GameService {
 
         String whiteUser = gameData.whiteUsername();
         String blackUser = gameData.blackUsername();
+        String joiningUser = authData.username();
 
         if (Objects.equals(color, "WHITE")) {
             if (whiteUser != null) {
+                if (joiningUser == whiteUser) {
+                    return true;
+                }
                 return false;
             } else {
-                whiteUser = authData.username();
+                whiteUser = joiningUser;
             }
         } else if (Objects.equals(color, "BLACK")) {
             if (blackUser != null) {
+                if (joiningUser == blackUser) {
+                    return true;
+                }
                 return false;
             } else {
-                blackUser = authData.username();
+                blackUser = joiningUser;
             }
         } else if (color == null || color.isEmpty()) {
             throw new BadRequestException("Error: Player color cannot be null or empty");
