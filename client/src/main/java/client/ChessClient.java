@@ -11,11 +11,9 @@ import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
 import ui.ChessBoardUI;
-
 import static ui.EscapeSequences.*;
 
 public class ChessClient {
-
     private String username = null;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
@@ -131,10 +129,10 @@ public class ChessClient {
             String black = game.blackUsername() != null ? game.blackUsername() : "(empty)";
 
             System.out.printf("%s%d.%s \"%s\" — White: %s%s%s, Black: %s%s%s%n",
-                    SET_TEXT_BOLD, displayNumber, RESET,
-                    game.gameName(),
-                    SET_TEXT_COLOR_BLUE, white, RESET,
-                    SET_TEXT_COLOR_RED, black, RESET);
+              SET_TEXT_BOLD, displayNumber, RESET,
+              game.gameName(),
+              SET_TEXT_COLOR_BLUE, white, RESET,
+              SET_TEXT_COLOR_RED, black, RESET);
         }
 
         return String.format("Listed %d game%s.", games.size(), games.size() == 1 ? "" : "s");
@@ -206,7 +204,7 @@ public class ChessClient {
             }
         }
 
-        ChessBoardUI.drawBoard(new ChessGame(), perspective);
+        ChessBoardUI.drawBoard(game.game(), perspective);
 
         if (chosenColor != null) {
             if (alreadyInGame) {
@@ -238,7 +236,7 @@ public class ChessClient {
         }
 
         server.observeGame(game.gameID());
-        ChessBoardUI.drawBoard(new ChessGame(), ChessGame.TeamColor.WHITE);
+        ChessBoardUI.drawBoard(game.game(), ChessGame.TeamColor.WHITE);
         return String.format("You are now observing game \"%s\".", game.gameName());
     }
 
