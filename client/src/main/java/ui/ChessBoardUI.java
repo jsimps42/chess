@@ -11,6 +11,8 @@ public class ChessBoardUI {
     private static final String LIGHT_SQUARE = SET_BG_COLOR_WHITE;
     private static final String DARK_SQUARE = SET_BG_COLOR_BLACK;
     private static final String RESET_BG = RESET_BG_COLOR;
+    private static final String DARK_HIGHLIGHT = SET_BG_COLOR_DARK_GREEN;
+    private static final String LIGHT_HIGHLIGHT = SET_BG_COLOR_GREEN;
 
     private static final String WHITE_COLOR = SET_TEXT_COLOR_BLUE;
     private static final String BLACK_COLOR = SET_TEXT_COLOR_RED;

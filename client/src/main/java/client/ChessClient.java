@@ -64,6 +64,11 @@ public class ChessClient {
                 case "observe" -> observeGame(params);
                 case "logout" -> logout();
                 case "quit" -> "quit";
+                case "redraw" -> redrawBoard();
+                case "show_moves" -> highlightLegalMoves(params);
+                case "move" -> makeMove(params);
+                case "leave" -> leave();
+                case "resign" -> resign();
                 default -> help();
             };
         } catch (Exception ex) {
@@ -249,6 +254,33 @@ public class ChessClient {
         return String.format("\"%s\" successfully signed out. Thank you for playing.", previousUser);
     }
 
+    public String redrawBoard() throws Exception {
+        assertSignedIn();
+        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+    }
+
+    public String highlightLegalMoves(String... params) throws Exception {
+        assertSignedIn();
+        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+    }
+
+    public String makeMove(String... params) throws Exception {
+        assertSignedIn();
+        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+    }
+
+    public String leave() throws Exception {
+        assertSignedIn();
+        state = State.SIGNEDIN;
+        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+    }
+
+    public String resign() throws Exception {
+        assertSignedIn();
+        state = State.SIGNEDIN;
+        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+    }
+
     public String help() {
         if (state == State.SIGNEDOUT) {
             return """
@@ -258,13 +290,31 @@ public class ChessClient {
                     help - with possible commands
                     """;
         }
+        else if (state == State.SIGNEDIN) {
+            return """
+                    create <NAME> - a game
+                    list - games
+                    join <ID> [WHITE|BLACK] - a game
+                    observe <ID> - a game
+                    logout - when you are done
+                    quit - playing chess
+                    help - with possible commands
+                    """;
+        }
+        else if (state == State.PLAYER) {
+            return """
+                    redraw - redraws the chessboard
+                    show_moves <pos> - highlights all legal moves for piece at pos (ex. a1)                    
+                    move <start> <end> - move piece from start to end (ex. move a1 a2)
+                    leave - exits game and allows other player to take your spot
+                    resign - forfeit the game
+                    help - with possible commands
+                    """;
+        }
         return """
-                create <NAME> - a game
-                list - games
-                join <ID> [WHITE|BLACK] - a game
-                observe <ID> - a game
-                logout - when you are done
-                quit - playing chess
+                redraw - redraws the chessboard
+                show_moves <pos> - highlights all legal moves for piece at pos (ex. a1)
+                leave - exits game and returns to previous menu
                 help - with possible commands
                 """;
     }
@@ -277,6 +327,8 @@ public class ChessClient {
 
     public enum State {
         SIGNEDOUT,
-        SIGNEDIN
+        SIGNEDIN,
+        PLAYER,
+        OBSERVER
     }
 }
