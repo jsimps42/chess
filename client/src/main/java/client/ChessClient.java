@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Collection;
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPosition;
 import chess.ChessPiece;
 import exception.ResponseException;
@@ -214,7 +216,7 @@ public class ChessClient {
             }
         }
 
-        ChessBoardUI.drawBoard(game.game(), perspective);
+        ChessBoardUI.drawBoard(game.game(), perspective, null);
 
         if (chosenColor != null) {
             if (alreadyInGame) {
@@ -246,7 +248,7 @@ public class ChessClient {
         }
 
         server.observeGame(game.gameID());
-        ChessBoardUI.drawBoard(game.game(), ChessGame.TeamColor.WHITE);
+        ChessBoardUI.drawBoard(game.game(), ChessGame.TeamColor.WHITE, null);
         return String.format("You are now observing game \"%s\".", game.gameName());
     }
 
@@ -264,7 +266,7 @@ public class ChessClient {
         ChessGame.TeamColor perspective = joinedGame.blackUsername() == username 
           ? ChessGame.TeamColor.BLACK 
           : ChessGame.TeamColor.WHITE;
-        ChessBoardUI.drawBoard(joinedGame.game(), perspective);
+        ChessBoardUI.drawBoard(joinedGame.game(), perspective, null);
         return String.format("Board successfully redrawn");
 
     }
@@ -286,6 +288,7 @@ public class ChessClient {
         if (highlightedPiece == null) {
             throw new Exception(String.format("There is no piece at pos: %s", params[0]));
         }
+        Collection<ChessMove> legalMoves = joinedGame.game().validMoves(piecePosition);
         return String.format("Displaying all legal moves for %c at %d", highlightedPiece.toString(), params[0]);
     }
 

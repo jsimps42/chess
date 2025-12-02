@@ -1,6 +1,7 @@
 package ui;
 
 import chess.*;
+import java.util.Collection;
 import static ui.EscapeSequences.*;
 
 public class ChessBoardUI {
@@ -21,7 +22,7 @@ public class ChessBoardUI {
     private static final String LABEL = SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD;
     private static final String RESET_LABEL = RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR;
 
-    public static void drawBoard(ChessGame game, ChessGame.TeamColor playerColor) {
+    public static void drawBoard(ChessGame game, ChessGame.TeamColor playerColor, Collection<ChessMove> legalMoves) {
         ChessBoard board = game.getBoard();
         System.out.print(RESET_TEXT + RESET_BG);
         if (playerColor == ChessGame.TeamColor.BLACK) {
