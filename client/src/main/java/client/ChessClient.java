@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import chess.ChessGame;
+import chess.ChessPosition;
+import chess.ChessPiece;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
@@ -269,10 +271,22 @@ public class ChessClient {
 
     public String highlightLegalMoves(String... params) throws Exception {
         assertInGame();
+        int col;
+        int row;
+        ChessPosition piecePosition;
+        ChessPiece highlightedPiece;
         if (params.length != 1) {
             throw new Exception("Expected: show_moves <pos> (ex. show_moves a1)");
         }
-        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+        col = params[0].charAt(0) - 'a' + 1;
+        row = params[0].charAt(1) - '0';
+        piecePosition = new ChessPosition(row, col);
+        highlightedPiece = joinedGame.game().getBoard().getPiece(piecePosition);
+
+        if (highlightedPiece == null) {
+            throw new Exception(String.format("There is no piece at pos: %s", params[0]));
+        }
+        return String.format("Displaying all legal moves for %c at %d", highlightedPiece.toString(), params[0]);
     }
 
     public String makeMove(String... params) throws Exception {
