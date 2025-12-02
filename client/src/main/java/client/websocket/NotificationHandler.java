@@ -1,5 +1,5 @@
 package client.websocket;
 
-public class NotificationHandler {
-    
+public interface NotificationHandler {
+    void notify(WebSocketFacade.Notification notification);
 }
