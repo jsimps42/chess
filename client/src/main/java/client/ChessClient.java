@@ -18,6 +18,7 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
     private final Map<Integer, GameData> gameIDsMap = new HashMap<>();
+    private GameData joinedGame = null;
 
     public ChessClient(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
@@ -201,6 +202,8 @@ public class ChessClient {
         if (chosenColor != null) {
             try {
                 server.joinGame(game.gameID(), chosenColor);
+                state = State.PLAYER;
+                joinedGame = game;
             } catch (ResponseException e) {
                 if (e.getMessage().contains("already taken") && alreadyInGame) {
                 } else {
@@ -255,28 +258,36 @@ public class ChessClient {
     }
 
     public String redrawBoard() throws Exception {
-        assertSignedIn();
-        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+        assertInGame();
+        ChessGame.TeamColor perspective = joinedGame.blackUsername() == username 
+          ? ChessGame.TeamColor.BLACK 
+          : ChessGame.TeamColor.WHITE;
+        ChessBoardUI.drawBoard(joinedGame.game(), perspective);
+        return String.format("Board successfully redrawn");
+
     }
 
     public String highlightLegalMoves(String... params) throws Exception {
-        assertSignedIn();
+        assertInGame();
+        if (params.length != 1) {
+            throw new Exception("Expected: show_moves <pos> (ex. show_moves a1)");
+        }
         return String.format("\"%s\" successfully signed out. Thank you for playing.");
     }
 
     public String makeMove(String... params) throws Exception {
-        assertSignedIn();
+        assertPlayer();
         return String.format("\"%s\" successfully signed out. Thank you for playing.");
     }
 
     public String leave() throws Exception {
-        assertSignedIn();
+        assertInGame();
         state = State.SIGNEDIN;
         return String.format("\"%s\" successfully signed out. Thank you for playing.");
     }
 
     public String resign() throws Exception {
-        assertSignedIn();
+        assertPlayer();
         state = State.SIGNEDIN;
         return String.format("\"%s\" successfully signed out. Thank you for playing.");
     }
@@ -320,8 +331,20 @@ public class ChessClient {
     }
 
     private void assertSignedIn() throws Exception {
-        if (state == State.SIGNEDOUT) {
+        if (state != State.SIGNEDIN) {
             throw new Exception("You must be signed in to run that command");
+        }
+    }
+
+    private void assertPlayer() throws Exception {
+        if (state != State.PLAYER) {
+            throw new Exception("You must be the player to run that command");
+        }
+    }
+
+    private void assertInGame() throws Exception {
+        if (state == State.SIGNEDOUT || state == State.SIGNEDIN) {
+            throw new Exception("You must be in a game to run that command");
         }
     }
 
