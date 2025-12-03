@@ -1,6 +1,8 @@
 package ui;
 
 import chess.*;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import static ui.EscapeSequences.*;
 
@@ -17,8 +19,8 @@ public class ChessBoardUI {
 
     private static final String WHITE_COLOR = SET_TEXT_COLOR_BLUE;
     private static final String BLACK_COLOR = SET_TEXT_COLOR_RED;
-    private static final String WHITE_HIGHLIGHT = SET_TEXT_COLOR_LIGHT_GREY;
-    private static final String BLACK_HIGHLIGHT = SET_TEXT_COLOR_MAGENTA;
+    private static final String WHITE_PIECE_HIGHLIGHT = SET_TEXT_COLOR_LIGHT_GREY;
+    private static final String BLACK_PIECE_HIGHLIGHT = SET_TEXT_COLOR_MAGENTA;
     private static final String RESET_TEXT = SET_TEXT_COLOR_WHITE;
 
     private static final String LABEL = SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD;
@@ -42,13 +44,18 @@ public class ChessBoardUI {
           ChessBoard board, 
           ChessGame.TeamColor playerColor,
           Collection<ChessMove> legalMoves) {
+        Collection<ChessPosition> squaresToHighlight = highlightSquares(legalMoves);
         printHeader(true);
+        
         for (int row = 7; row >= 0; row--) {
             printRowLabel(row + 1);
             for (int col = 0; col < BOARD_SIZE; col++) {
                 ChessPosition pos = new ChessPosition(row + 1, col + 1);
+                ChessPiece piece = board.getPiece(pos);
                 boolean isLight = isLightInWhiteView(row, col);
-                printSquare(board.getPiece(pos), isLight, playerColor);
+                boolean highlight = squaresToHighlight.contains(pos);
+                boolean isCheckedPiece = pos == legalMoves.iterator().next().getStartPosition();
+                printSquare(piece, isLight, playerColor, highlight, isCheckedPiece);
             }
             printRowLabel(row + 1);
             System.out.println(RESET_BG);
@@ -60,13 +67,18 @@ public class ChessBoardUI {
           ChessBoard board, 
           ChessGame.TeamColor playerColor, 
           Collection<ChessMove> legalMoves) {
+        Collection<ChessPosition> squaresToHighlight = highlightSquares(legalMoves);
         printHeader(false);
+        
         for (int row = 0; row < BOARD_SIZE; row++) {
             printRowLabel(row + 1);
             for (int col = 0; col < BOARD_SIZE; col++) {
                 ChessPosition pos = new ChessPosition(8 - row, 8 - col);
+                ChessPiece piece = board.getPiece(pos);
                 boolean isLight = isLightInBlackView(row, col);
-                printSquare(board.getPiece(pos), isLight, playerColor);
+                boolean highlight = squaresToHighlight.contains(pos);
+                boolean isCheckedPiece = pos == legalMoves.iterator().next().getStartPosition();
+                printSquare(piece, isLight, playerColor, highlight, isCheckedPiece);
             }
             printRowLabel(row + 1);
             System.out.println(RESET_BG);
@@ -98,14 +110,25 @@ public class ChessBoardUI {
     private static void printSquare(
           ChessPiece piece, 
           boolean isLight, 
-          ChessGame.TeamColor playerColor) {
-        String bg = isLight ? LIGHT_SQUARE : DARK_SQUARE;
+          ChessGame.TeamColor playerColor,
+          boolean highlight,
+          boolean isCheckedPiece) {
+        String bg;
+        if (highlight) {
+            bg = isLight ? LIGHT_HIGHLIGHT : DARK_HIGHLIGHT;
+        }
+        else {
+            bg = isLight ? LIGHT_SQUARE : DARK_SQUARE;
+        }
         System.out.print(bg);
 
         if (piece == null) {
             System.out.print(EMPTY);
         } else {
-            String textColor = (piece.getTeamColor() == playerColor) ? WHITE_COLOR : BLACK_COLOR;
+            String textColor = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_COLOR : BLACK_COLOR;
+            if (isCheckedPiece) {
+                textColor = textColor == WHITE_COLOR ? WHITE_PIECE_HIGHLIGHT : BLACK_PIECE_HIGHLIGHT;
+            }
             System.out.print(textColor + getPieceSymbol(piece) + RESET_TEXT);
         }
         System.out.print(RESET_BG);
@@ -120,5 +143,13 @@ public class ChessBoardUI {
             case KNIGHT -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_KNIGHT : BLACK_KNIGHT;
             case PAWN -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_PAWN : BLACK_PAWN;
         };
+    }
+
+    private static Collection<ChessPosition> highlightSquares(Collection<ChessMove> legalMoves) {
+        Collection<ChessPosition> highlightedSquares = new ArrayList<>();
+        for (ChessMove move : legalMoves) {
+            highlightedSquares.add(move.getEndPosition());
+        }
+        return highlightedSquares;
     }
 }
