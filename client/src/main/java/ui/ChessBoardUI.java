@@ -17,23 +17,31 @@ public class ChessBoardUI {
 
     private static final String WHITE_COLOR = SET_TEXT_COLOR_BLUE;
     private static final String BLACK_COLOR = SET_TEXT_COLOR_RED;
+    private static final String WHITE_HIGHLIGHT = SET_TEXT_COLOR_LIGHT_GREY;
+    private static final String BLACK_HIGHLIGHT = SET_TEXT_COLOR_MAGENTA;
     private static final String RESET_TEXT = SET_TEXT_COLOR_WHITE;
 
     private static final String LABEL = SET_TEXT_COLOR_YELLOW + SET_TEXT_BOLD;
     private static final String RESET_LABEL = RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR;
 
-    public static void drawBoard(ChessGame game, ChessGame.TeamColor playerColor, Collection<ChessMove> legalMoves) {
+    public static void drawBoard(
+          ChessGame game, 
+          ChessGame.TeamColor playerColor, 
+          Collection<ChessMove> legalMoves) {
         ChessBoard board = game.getBoard();
         System.out.print(RESET_TEXT + RESET_BG);
         if (playerColor == ChessGame.TeamColor.BLACK) {
-            drawBoardBlackPerspective(board, playerColor);
+            drawBoardBlackPerspective(board, playerColor, legalMoves);
         } else {
-            drawBoardWhitePerspective(board, playerColor);
+            drawBoardWhitePerspective(board, playerColor, legalMoves);
         }
         System.out.println(RESET_TEXT + RESET_BG);
     }
 
-    private static void drawBoardWhitePerspective(ChessBoard board, ChessGame.TeamColor playerColor) {
+    private static void drawBoardWhitePerspective(
+          ChessBoard board, 
+          ChessGame.TeamColor playerColor,
+          Collection<ChessMove> legalMoves) {
         printHeader(true);
         for (int row = 7; row >= 0; row--) {
             printRowLabel(row + 1);
@@ -48,7 +56,10 @@ public class ChessBoardUI {
         printHeader(true);
     }
 
-    private static void drawBoardBlackPerspective(ChessBoard board, ChessGame.TeamColor playerColor) {
+    private static void drawBoardBlackPerspective(
+          ChessBoard board, 
+          ChessGame.TeamColor playerColor, 
+          Collection<ChessMove> legalMoves) {
         printHeader(false);
         for (int row = 0; row < BOARD_SIZE; row++) {
             printRowLabel(row + 1);
@@ -84,7 +95,10 @@ public class ChessBoardUI {
         System.out.print(LABEL + " " + row + " " + RESET_LABEL);
     }
 
-    private static void printSquare(ChessPiece piece, boolean isLight, ChessGame.TeamColor playerColor) {
+    private static void printSquare(
+          ChessPiece piece, 
+          boolean isLight, 
+          ChessGame.TeamColor playerColor) {
         String bg = isLight ? LIGHT_SQUARE : DARK_SQUARE;
         System.out.print(bg);
 
