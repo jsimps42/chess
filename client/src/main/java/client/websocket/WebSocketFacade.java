@@ -6,6 +6,8 @@ import jakarta.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import websocket.messages.*;
+import websocket.commands.*;
 
 public class WebSocketFacade extends Endpoint {
 
@@ -25,7 +27,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
+                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                     notificationHandler.notify(notification);
                 }
             });
@@ -39,44 +41,39 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void login (String username, String password) throws ResponseException {
+    public void joinGame (String authToken, int gameID) throws ResponseException {
         try {
-            var action = new Action(Action.Type.LOGIN, username);
+            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
-    public void logout (String username) throws ResponseException {
+    public void makeMove (String authToken, int gameID) throws ResponseException {
         try {
-            var action = new Action(Action.Type.LOGOUT, username);
+            var action = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
-    public record Action(Type type, String visitorName) {
-        public enum Type {
-            LOGIN,
-            LOGOUT
-        }
-
-        public String toString() {
-            return new Gson().toJson(this);
+    public void leave (String authToken, int gameID) throws ResponseException {
+        try {
+            var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException ex) {
+            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
-    public record Notification(Type type, String message) {
-        public enum Type {
-            ARRIVAL,
-            NOISE,
-            DEPARTURE
-        }
-
-        public String toString() {
-            return new Gson().toJson(this);
+    public void resign (String authToken, int gameID) throws ResponseException {
+        try {
+            var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException ex) {
+            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 }
