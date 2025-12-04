@@ -15,17 +15,21 @@ import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
 import ui.ChessBoardUI;
+import websocket.messages.ServerMessage;
+import client.websocket.*;
 import static ui.EscapeSequences.*;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler {
     private String username = null;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
     private final Map<Integer, GameData> gameIDsMap = new HashMap<>();
     private GameData joinedGame = null;
+    private final WebSocketFacade ws;
 
     public ChessClient(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
+        ws = new WebSocketFacade(serverUrl, this);
     }
 
     public void run() {
@@ -158,7 +162,7 @@ public class ChessClient {
         try {
             displayNumber = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
-            throw new Exception("Invalid ID – refer to list and select a game ID");
+            throw new Exception("Invalid game ID – refer to list and select a game ID");
         }
 
         GameData game = gameIDsMap.get(displayNumber);
@@ -207,7 +211,6 @@ public class ChessClient {
             try {
                 server.joinGame(game.gameID(), chosenColor);
                 state = State.PLAYER;
-                joinedGame = game;
             } catch (ResponseException e) {
                 if (e.getMessage().contains("already taken") && alreadyInGame) {
                 } else {
@@ -217,7 +220,7 @@ public class ChessClient {
         }
 
         ChessBoardUI.drawBoard(game.game(), perspective, null);
-
+        joinedGame = game;
         if (chosenColor != null) {
             if (alreadyInGame) {
                 return String.format("Rejoined game \"%s\" as %s", game.gameName(), chosenColor);
@@ -239,16 +242,18 @@ public class ChessClient {
         try {
             displayNumber = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
-            throw new Exception("Invalid ID – refer to list and select a game ID");
+            throw new Exception("Invalid game ID – refer to list and select a game ID");
         }
 
         GameData game = gameIDsMap.get(displayNumber);
         if (game == null) {
-            throw new Exception("Invalid ID – refer to list and select a game ID");
+            throw new Exception("Invalid game ID – refer to list and select a game ID");
         }
 
         server.observeGame(game.gameID());
         ChessBoardUI.drawBoard(game.game(), ChessGame.TeamColor.WHITE, null);
+        joinedGame = game;
+        state = State.OBSERVER;
         return String.format("You are now observing game \"%s\".", game.gameName());
     }
 
@@ -268,7 +273,6 @@ public class ChessClient {
           : ChessGame.TeamColor.WHITE;
         ChessBoardUI.drawBoard(joinedGame.game(), perspective, null);
         return String.format("Board successfully redrawn");
-
     }
 
     public String highlightLegalMoves(String... params) throws Exception {
@@ -299,8 +303,14 @@ public class ChessClient {
 
     public String leave() throws Exception {
         assertInGame();
+        if (state == State.PLAYER) {
+            if (username == joinedGame.blackUsername()) {
+
+            }
+        }
         state = State.SIGNEDIN;
-        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+        joinedGame = null;
+        return String.format("Successfully left the game.");
     }
 
     public String resign() throws Exception {
@@ -370,5 +380,11 @@ public class ChessClient {
         SIGNEDIN,
         PLAYER,
         OBSERVER
+    }
+
+    @Override
+    public void notify(ServerMessage notification) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'notify'");
     }
 }

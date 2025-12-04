@@ -136,7 +136,6 @@ public class ServerFacade {
     }
 
     private record LoginRequest(String username, String password) {
-
     }
 
     private record JoinGameRequest(
