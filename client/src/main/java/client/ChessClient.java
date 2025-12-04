@@ -21,6 +21,7 @@ import static ui.EscapeSequences.*;
 
 public class ChessClient implements NotificationHandler {
     private String username = null;
+    private String authToken = null;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
     private final Map<Integer, GameData> gameIDsMap = new HashMap<>();
@@ -74,7 +75,7 @@ public class ChessClient implements NotificationHandler {
                 case "logout" -> logout();
                 case "quit" -> "quit";
                 case "redraw" -> redrawBoard();
-                case "show_moves" -> highlightLegalMoves(params);
+                case "highlight" -> highlightLegalMoves(params);
                 case "move" -> makeMove(params);
                 case "leave" -> leave();
                 case "resign" -> resign();
@@ -90,7 +91,7 @@ public class ChessClient implements NotificationHandler {
             String username = params[0];
             String password = params[1];
             String email = params[2];
-            server.register(username, password, email);
+            authToken = server.register(username, password, email).authToken();
             this.username = username;
             state = State.SIGNEDIN;
             return String.format("Registration complete. Successfully signed in as \"%s\".", username);
@@ -102,7 +103,7 @@ public class ChessClient implements NotificationHandler {
         if (params.length == 2) {
             String username = params[0];
             String password = params[1];
-            server.login(username, password);
+            authToken = server.login(username, password).authToken();
             this.username = username;
             state = State.SIGNEDIN;
             return String.format("Successfully signed in as \"%s\".", username);
@@ -263,6 +264,7 @@ public class ChessClient implements NotificationHandler {
         server.logout();
         String previousUser = this.username;
         this.username = null;
+        authToken = null;
         return String.format("\"%s\" successfully signed out. Thank you for playing.", previousUser);
     }
 
@@ -281,11 +283,14 @@ public class ChessClient implements NotificationHandler {
         int row;
         ChessPosition piecePosition;
         ChessPiece highlightedPiece;
-        if (params.length != 1) {
-            throw new Exception("Expected: show_moves <pos> (ex. show_moves a1)");
+        if (params.length != 2) {
+            throw new Exception("Expected: highlight <pos> (ex. highlight a1)");
         }
-        col = params[0].charAt(0) - 'a' + 1;
-        row = params[0].charAt(1) - '0';
+        col = params[1].charAt(0) - 'a' + 1;
+        row = params[1].charAt(1) - '0';
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
+            throw new Exception("Error: position is out of bounds. Should be between a1 and h8.");
+        }
         piecePosition = new ChessPosition(row, col);
         highlightedPiece = joinedGame.game().getBoard().getPiece(piecePosition);
 
@@ -303,11 +308,7 @@ public class ChessClient implements NotificationHandler {
 
     public String leave() throws Exception {
         assertInGame();
-        if (state == State.PLAYER) {
-            if (username == joinedGame.blackUsername()) {
-
-            }
-        }
+        ws.leave(authToken, joinedGame.gameID());
         state = State.SIGNEDIN;
         joinedGame = null;
         return String.format("Successfully left the game.");
@@ -315,8 +316,20 @@ public class ChessClient implements NotificationHandler {
 
     public String resign() throws Exception {
         assertPlayer();
-        state = State.SIGNEDIN;
-        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+         try {
+            System.out.print("This will end the current game.\nType 'resign' again to confirm your resignation: ");
+            Scanner scanner = new Scanner(System.in);
+            String confirmation = scanner.nextLine().toLowerCase();
+            if (confirmation != "resign") {
+                return "Resignation cancelled. Continuing game.";
+            }
+            ws.resign(authToken, joinedGame.gameID());
+            state = State.SIGNEDIN;
+            joinedGame = null;
+            return "Successfully resigned from the game.";
+        } catch (Exception e) {
+            return "Unable to resign.";
+        }
     }
 
     public String help() {
@@ -342,7 +355,7 @@ public class ChessClient implements NotificationHandler {
         else if (state == State.PLAYER) {
             return """
                     redraw - redraws the chessboard
-                    show_moves <pos> - highlights all legal moves for piece at pos (ex. a1)                    
+                    highlight <pos> - highlights all legal moves for piece at pos (ex. a1)                    
                     move <start> <end> - move piece from start to end (ex. move a1 a2)
                     leave - exits game and allows other player to take your spot
                     resign - forfeit the game
@@ -351,7 +364,7 @@ public class ChessClient implements NotificationHandler {
         }
         return """
                 redraw - redraws the chessboard
-                show_moves <pos> - highlights all legal moves for piece at pos (ex. a1)
+                highlight <pos> - highlights all legal moves for piece at pos (ex. a1)
                 leave - exits game and returns to previous menu
                 help - with possible commands
                 """;
