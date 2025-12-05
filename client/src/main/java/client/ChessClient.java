@@ -15,8 +15,8 @@ import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
 import ui.ChessBoardUI;
-import websocket.messages.ServerMessage;
 import client.websocket.*;
+import websocket.messages.*;
 import static ui.EscapeSequences.*;
 
 public class ChessClient implements NotificationHandler {
@@ -211,7 +211,6 @@ public class ChessClient implements NotificationHandler {
         if (chosenColor != null) {
             try {
                 server.joinGame(game.gameID(), chosenColor);
-                state = State.PLAYER;
             } catch (ResponseException e) {
                 if (e.getMessage().contains("already taken") && alreadyInGame) {
                 } else {
@@ -222,6 +221,8 @@ public class ChessClient implements NotificationHandler {
 
         ChessBoardUI.drawBoard(game.game(), perspective, null);
         joinedGame = game;
+        state = State.PLAYER;
+        ws.joinGame(authToken, game.gameID());
         if (chosenColor != null) {
             if (alreadyInGame) {
                 return String.format("Rejoined game \"%s\" as %s", game.gameName(), chosenColor);
@@ -254,6 +255,7 @@ public class ChessClient implements NotificationHandler {
         server.observeGame(game.gameID());
         ChessBoardUI.drawBoard(game.game(), ChessGame.TeamColor.WHITE, null);
         joinedGame = game;
+        ws.joinGame(authToken, game.gameID());
         state = State.OBSERVER;
         return String.format("You are now observing game \"%s\".", game.gameName());
     }
@@ -447,7 +449,28 @@ public class ChessClient implements NotificationHandler {
 
     @Override
     public void notify(ServerMessage notification) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'notify'");
+        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            LoadGameMessage loadGameMessage = (LoadGameMessage) notification;
+            joinedGame = new GameData(
+              loadGameMessage.getGame(),
+              joinedGame.gameID(),
+              joinedGame.gameName(),
+              joinedGame.whiteUsername(),
+              joinedGame.blackUsername());
+            try { 
+                redrawBoard();
+            } catch (Exception e) {
+            }
+        }
+
+        else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+            ErrorMessage errorMessage = (ErrorMessage) notification;
+            System.out.println(errorMessage.getErrorMessage());
+        }
+
+        else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+            NotificationMessage notificationMessage = (NotificationMessage) notification;
+            System.out.println(notificationMessage.getNotificationMessage());
+        }
     }
 }
