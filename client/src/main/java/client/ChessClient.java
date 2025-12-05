@@ -279,19 +279,13 @@ public class ChessClient implements NotificationHandler {
 
     public String highlightLegalMoves(String... params) throws Exception {
         assertInGame();
-        int col;
-        int row;
         ChessPosition piecePosition;
         ChessPiece highlightedPiece;
-        if (params.length != 2) {
+        if (params.length != 1) {
             throw new Exception("Expected: highlight <pos> (ex. highlight a1)");
         }
-        col = params[1].charAt(0) - 'a' + 1;
-        row = params[1].charAt(1) - '0';
-        if (col < 1 || col > 8 || row < 1 || row > 8) {
-            throw new Exception("Error: position is out of bounds. Should be between a1 and h8.");
-        }
-        piecePosition = new ChessPosition(row, col);
+        
+        piecePosition = getPosition(params[0]);
         highlightedPiece = joinedGame.game().getBoard().getPiece(piecePosition);
 
         if (highlightedPiece == null) {
@@ -303,7 +297,37 @@ public class ChessClient implements NotificationHandler {
 
     public String makeMove(String... params) throws Exception {
         assertPlayer();
-        return String.format("\"%s\" successfully signed out. Thank you for playing.");
+
+        if (params.length != 2) {
+            throw new Exception("Expected: makeMove <start> <end> (ex. move a1 b2)");
+        }
+
+        ChessPosition start = getPosition(params[0]);
+        ChessPosition end = getPosition(params[1]);
+        ChessPiece.PieceType promotionPiece = null;
+
+        if (checkNeedsPromotion(start, end)) {
+            Scanner scanner = new Scanner(System.in);
+            String choice = "";
+            while (choice != "QUEEN" && choice != "BISHOP" && choice != "KNIGHT" && choice != "ROOK") {
+                System.out.print("\nChoose your promotion piece (queen, bishop, knight, rook): ");
+                choice = scanner.nextLine().toUpperCase();
+            }
+            if (choice == "QUEEN") {
+                promotionPiece = ChessPiece.PieceType.QUEEN;
+            }
+            else if (choice == "BISHOP") {
+                promotionPiece = ChessPiece.PieceType.BISHOP;
+            }
+            else if (choice == "KNIGHT") {
+                promotionPiece = ChessPiece.PieceType.KNIGHT;
+            }
+            else {
+                promotionPiece = ChessPiece.PieceType.ROOK;
+            }
+        }
+        ws.makeMove(authToken, joinedGame.gameID(), new ChessMove(start, end, promotionPiece));
+        return String.format("Move is being sent. Please wait...");
     }
 
     public String leave() throws Exception {
@@ -386,6 +410,32 @@ public class ChessClient implements NotificationHandler {
         if (state == State.SIGNEDOUT || state == State.SIGNEDIN) {
             throw new Exception("You must be in a game to run that command");
         }
+    }
+
+    private ChessPosition getPosition(String param) throws Exception {
+        int col;
+        int row;
+
+        if (param.length() != 2) {
+            throw new Exception("Error: position is invalid. Should be between a1 and h8.");
+        }
+
+        col = param.charAt(0) - 'a' + 1;
+        row = param.charAt(1) - '0';
+
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
+            throw new Exception("Error: position is out of bounds. Should be between a1 and h8.");
+        }
+        return new ChessPosition(row, col);
+    }
+
+    private boolean checkNeedsPromotion(ChessPosition start, ChessPosition end) {
+        ChessPiece movingPiece = joinedGame.game().getBoard().getPiece(start);
+        if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN &&
+          (end.getRow() == 1 || end.getRow() == 8)) {
+            return true;
+        }
+        return false;
     }
 
     public enum State {
