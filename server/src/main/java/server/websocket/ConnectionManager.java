@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<Session, Session> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Session, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(Session session) {
-        connections.put(session, session);
+    public void add(Session session, int gameID, String authToken, String username, boolean isPlayer) {
+        Connection connection = new Connection(session, gameID, authToken, username, isPlayer);
+        connections.put(session, connection);
     }
 
     public void remove(Session session) {
@@ -26,5 +27,26 @@ public class ConnectionManager {
                 }
             }
         }
+    }
+
+    public static class Connection {
+        public Session session;
+        public int gameID;
+        public String authToken;
+        public String username;
+        public boolean isPlayer;
+
+        public Connection(
+          Session session,
+          int gameID,
+          String authToken,
+          String username,
+          boolean isPlayer) {
+            this.session = session;
+            this.gameID = gameID;
+            this.authToken = authToken;
+            this.username = username;
+            this.isPlayer = isPlayer;
+          }
     }
 }

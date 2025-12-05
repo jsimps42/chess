@@ -10,6 +10,7 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.*;
+import websocket.commands.*;
 
 import java.io.IOException;
 
@@ -41,14 +42,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void enter(String visitorName, Session session) throws IOException {
+    private void connect(String visitorName, Session session) throws IOException {
         connections.add(session);
         var message = String.format("%s is in the shop", visitorName);
         var notification = new Notification(Notification.Type.ARRIVAL, message);
         connections.broadcast(session, notification);
     }
 
-    private void exit(String visitorName, Session session) throws IOException {
+    private void leave(String visitorName, Session session) throws IOException {
         var message = String.format("%s left the shop", visitorName);
         var notification = new Notification(Notification.Type.DEPARTURE, message);
         connections.broadcast(session, notification);
