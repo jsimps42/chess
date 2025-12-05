@@ -30,7 +30,7 @@ public class ChessClient implements NotificationHandler {
 
     public ChessClient(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
-        ws = new WebSocketFacade(serverUrl, this);
+        ws = new WebSocketFacade(serverUrl, (NotificationHandler) this);
     }
 
     public void run() {
