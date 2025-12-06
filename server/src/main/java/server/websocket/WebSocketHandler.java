@@ -216,28 +216,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         AuthAccess authAccess = new MySQLAuthAccess();
         AuthData authData;
+        GameAccess gameAccess = new MySQLGameAccess();
+        GameData gameData;
         try { 
             authData = authAccess.getAuth(cmd.getAuthToken());
+            gameData = gameAccess.getGame(cmd.getGameID());
         } catch(Exception e) {
             throw new DataAccessException(e.getMessage());
         }
-        if (authData == null) {
+        if (authData == null || gameData == null) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: invalid authToken")));
             return;
         }
 
-        GameAccess gameAccess = new MySQLGameAccess();
-        GameData gameData;
-        try {
-            gameData = gameAccess.getGame(connection.gameID);
-        } catch(Exception e) {
-            throw new DataAccessException(e.getMessage());
-        }
-        if (gameData == null) {
-            return;
-        }
         ChessGame game = gameData.game();
-
         if (game.gameOver) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("The game is over.")));
             return;
@@ -301,23 +293,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 game.gameOver = true;
             }
             else {
-                connections.broadcastAll(
-                  new NotificationMessage(otherUsername + " is in check."), 
-                  gameData.gameID());
-                }
+                connections.broadcastAll(new NotificationMessage(otherUsername + " is in check."), gameData.gameID());
+            }
         }
 
         try {
-            gameAccess.updateGame( new GameData(
-              game, 
-              gameData.gameID(), 
-              gameData.gameName(), 
-              gameData.whiteUsername(),
-              gameData.blackUsername()));
+            gameAccess.updateGame( new GameData(game, gameData.gameID(), gameData.gameName(), 
+              gameData.whiteUsername(), gameData.blackUsername()));
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
-
         connections.broadcastAll(new LoadGameMessage(game, gameData.gameID()), gameData.gameID());
     }
 }
