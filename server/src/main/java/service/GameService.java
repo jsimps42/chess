@@ -5,6 +5,7 @@ import model.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Random;
+import chess.ChessGame;
 
 public class GameService {
     GameAccess gameAccess;
@@ -32,7 +33,7 @@ public class GameService {
             gameID = rand.nextInt(9999) + 1;
         } while (gameAccess.gameExists(gameID));
 
-        gameAccess.createGame(new GameData(null, gameID, gameName, null, null));
+        gameAccess.createGame(new GameData(new ChessGame(), gameID, gameName, null, null));
 
         return gameID;
     }

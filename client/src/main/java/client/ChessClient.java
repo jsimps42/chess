@@ -115,7 +115,8 @@ public class ChessClient implements NotificationHandler {
         assertSignedIn();
         if (params.length == 1) {
             String gameName = params[0];
-            server.createGame(new GameData(new ChessGame(), 0, gameName, null, null));
+            GameData gameData = new GameData(new ChessGame(), 0, gameName, null, null);
+            server.createGame(gameData);
             return String.format("Game \"%s\" successfully created.", gameName);
         }
         throw new Exception("Expected: <NAME>");
@@ -219,6 +220,9 @@ public class ChessClient implements NotificationHandler {
             }
         }
         ChessGame game = gameData.game();
+        if (game == null) {
+            game = new ChessGame();
+        }
         ChessBoardUI.drawBoard(game, perspective, null);
         joinedGameData = gameData;
         state = State.PLAYER;
@@ -253,7 +257,10 @@ public class ChessClient implements NotificationHandler {
         }
 
         ChessGame game = gameData.game();
-        ChessBoardUI.drawBoard(gameData.game(), ChessGame.TeamColor.WHITE, null);
+        if (game == null) {
+            game = new ChessGame();
+        }
+        ChessBoardUI.drawBoard(game, ChessGame.TeamColor.WHITE, null);
         joinedGameData = gameData;
         ws.joinGame(authToken, gameData.gameID());
         state = State.OBSERVER;
@@ -272,6 +279,7 @@ public class ChessClient implements NotificationHandler {
 
     public String redrawBoard() throws Exception {
         assertInGame();
+        joinedGameData = server.getGame(joinedGameData.gameID());
         ChessGame.TeamColor perspective = joinedGameData.blackUsername() == username 
           ? ChessGame.TeamColor.BLACK 
           : ChessGame.TeamColor.WHITE;
@@ -283,6 +291,7 @@ public class ChessClient implements NotificationHandler {
         assertInGame();
         ChessPosition piecePosition;
         ChessPiece highlightedPiece;
+        joinedGameData = server.getGame(joinedGameData.gameID());
         if (params.length != 1) {
             throw new Exception("Expected: highlight <pos> (ex. highlight a1)");
         }
@@ -293,12 +302,17 @@ public class ChessClient implements NotificationHandler {
         if (highlightedPiece == null) {
             throw new Exception(String.format("There is no piece at pos: %s", params[0]));
         }
+        ChessGame.TeamColor perspective = joinedGameData.blackUsername() == username 
+          ? ChessGame.TeamColor.BLACK 
+          : ChessGame.TeamColor.WHITE;
         Collection<ChessMove> legalMoves = joinedGameData.game().validMoves(piecePosition);
-        return String.format("Displaying all legal moves for %c at %d", highlightedPiece.toString(), params[0]);
+        ChessBoardUI.drawBoard(joinedGameData.game(), perspective, legalMoves);
+        return String.format("Displaying all legal moves for piece at %s", params[0]);
     }
 
     public String makeMove(String... params) throws Exception {
         assertPlayer();
+        joinedGameData = server.getGame(joinedGameData.gameID());
 
         if (params.length != 2) {
             throw new Exception("Expected: makeMove <start> <end> (ex. move a1 b2)");
@@ -334,6 +348,7 @@ public class ChessClient implements NotificationHandler {
 
     public String leave() throws Exception {
         assertInGame();
+        joinedGameData = server.getGame(joinedGameData.gameID());
         ws.leave(authToken, joinedGameData.gameID());
         state = State.SIGNEDIN;
         joinedGameData = null;
@@ -342,6 +357,7 @@ public class ChessClient implements NotificationHandler {
 
     public String resign() throws Exception {
         assertPlayer();
+        joinedGameData = server.getGame(joinedGameData.gameID());
          try {
             System.out.print("This will end the current game.\nType 'resign' again to confirm your resignation: ");
             Scanner scanner = new Scanner(System.in);

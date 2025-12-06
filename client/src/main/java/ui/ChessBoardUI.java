@@ -58,8 +58,16 @@ public class ChessBoardUI {
                 ChessPosition pos = new ChessPosition(row + 1, col + 1);
                 ChessPiece piece = board.getPiece(pos);
                 boolean isLight = isLightInWhiteView(row, col);
-                boolean highlight = squaresToHighlight.contains(pos);
-                boolean isCheckedPiece = pos == legalMoves.iterator().next().getStartPosition();
+                boolean highlight = false;
+                if (squaresToHighlight != null ) {
+                    highlight = squaresToHighlight.contains(pos);
+                }                boolean isCheckedPiece;
+                if (legalMoves == null) {
+                    isCheckedPiece = false;
+                }
+                else {
+                    isCheckedPiece = (pos == legalMoves.iterator().next().getStartPosition());
+                }
                 printSquare(piece, isLight, playerColor, highlight, isCheckedPiece);
             }
             printRowLabel(row + 1);
@@ -81,8 +89,17 @@ public class ChessBoardUI {
                 ChessPosition pos = new ChessPosition(8 - row, 8 - col);
                 ChessPiece piece = board.getPiece(pos);
                 boolean isLight = isLightInBlackView(row, col);
-                boolean highlight = squaresToHighlight.contains(pos);
-                boolean isCheckedPiece = pos == legalMoves.iterator().next().getStartPosition();
+                boolean highlight = false;
+                if (squaresToHighlight != null ) {
+                    highlight = squaresToHighlight.contains(pos);
+                }
+                boolean isCheckedPiece;
+                if (legalMoves == null) {
+                    isCheckedPiece = false;
+                }
+                else {
+                    isCheckedPiece = (pos == legalMoves.iterator().next().getStartPosition());
+                }
                 printSquare(piece, isLight, playerColor, highlight, isCheckedPiece);
             }
             printRowLabel(row + 1);
@@ -152,6 +169,9 @@ public class ChessBoardUI {
 
     private static Collection<ChessPosition> highlightSquares(Collection<ChessMove> legalMoves) {
         Collection<ChessPosition> highlightedSquares = new ArrayList<>();
+        if (legalMoves == null) {
+            return null;
+        }
         for (ChessMove move : legalMoves) {
             highlightedSquares.add(move.getEndPosition());
         }
