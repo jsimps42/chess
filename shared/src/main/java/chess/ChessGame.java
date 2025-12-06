@@ -14,6 +14,7 @@ import com.google.gson.annotations.Expose;
 public class ChessGame {
     @Expose private TeamColor teamTurn;
     @Expose private ChessBoard currentBoard = new ChessBoard();
+    public boolean gameOver = false;
 
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
