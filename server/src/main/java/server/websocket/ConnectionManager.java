@@ -23,7 +23,7 @@ public class ConnectionManager {
     public void broadcast(Session excludeSession, ServerMessage message, int gameID) throws IOException {
         String msg = new Gson().toJson(message);
         for (Connection c : connections.values()) {
-            if (c.session.isOpen()) {
+            if (c.session.isOpen() && c.gameID == gameID) {
                 if (!c.session.equals(excludeSession)) {
                     c.session.getRemote().sendString(msg);
                 }

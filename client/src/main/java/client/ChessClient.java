@@ -342,7 +342,13 @@ public class ChessClient implements NotificationHandler {
                 promotionPiece = ChessPiece.PieceType.ROOK;
             }
         }
-        ws.makeMove(authToken, joinedGameData.gameID(), new ChessMove(start, end, promotionPiece));
+        ChessMove attemptedMove = new ChessMove(start, end, promotionPiece);
+        Collection<ChessMove> legalMoves = joinedGameData.game().validMoves(start);
+        if (!legalMoves.contains(attemptedMove)) {
+            throw new Exception ("Error: move is invalid. Try highlight <pos> to see legal moves.");
+        }
+
+        ws.makeMove(authToken, joinedGameData.gameID(), attemptedMove);
         return String.format("Move is being sent. Please wait...");
     }
 

@@ -208,7 +208,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.broadcastAll(new NotificationMessage(info.username + " has resigned and forfeited the game. Game Over."), gameData.gameID());
     }
 
-    private void makeMove(MakeMoveCommand cmd, Session session) throws DataAccessException, IOException {
+    private void makeMove(MakeMoveCommand cmd, Session session) throws DataAccessException, IOException{
         var connection = connections.get(session);
         if (connection == null) {
             return;
@@ -265,7 +265,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         try {
             game.makeMove(move);
-        } catch (Exception e) {
+        } catch (InvalidMoveException ex) {
+            ErrorMessage err = new ErrorMessage("Error: invalid move");
+            session.getRemote().sendString(new Gson().toJson(err));
+            return;
         }
 
         String start = move.getStartPosition().toString();
