@@ -5,6 +5,7 @@ import io.javalin.Javalin;
 import service.*;
 import io.javalin.json.JavalinGson;
 import server.handler.*;
+import server.websocket.WebSocketHandler;
 
 public class Server {
     UserAccess userAccess;
@@ -17,6 +18,8 @@ public class Server {
     ClearHandler clearHandler;
 
     private Javalin server;
+    private final WebSocketHandler webSocketHandler;
+
 
     public Server() {
             userAccess = new MemoryUserAccess();
@@ -35,6 +38,8 @@ public class Server {
         gameHandler = new GameHandler(gameService);
         clearHandler = new ClearHandler(gameService, userService);
 
+        webSocketHandler = new WebSocketHandler();
+
         server = Javalin.create(config -> {
             config.staticFiles.add("web");
             config.jsonMapper(new JavalinGson());
@@ -47,6 +52,12 @@ public class Server {
         server.get("/game", gameHandler::listGames);
         server.get("/game/{gameID}", gameHandler::observeGame);
         server.put("/game", gameHandler::joinGame);
+
+        server.ws("ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
 
         server.exception(BadRequestException.class, (e, ctx) -> ctx.status(400).json(new ErrorResponse("Error: bad request")));
         server.exception(UnauthorizedException.class, (e, ctx) -> ctx.status(401).json(new ErrorResponse("Error: unauthorized")));
