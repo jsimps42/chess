@@ -24,8 +24,8 @@ public class ChessClient implements NotificationHandler {
     private String authToken = null;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
-    private final Map<Integer, GameData> gameIDsMap = new HashMap<>();
-    private GameData joinedGame = null;
+    private final HashMap<Integer, Integer> gameIDsMap = new HashMap<>();
+    private GameData joinedGameData = null;
     private final WebSocketFacade ws;
 
     public ChessClient(String serverUrl) throws Exception {
@@ -135,17 +135,17 @@ public class ChessClient implements NotificationHandler {
         }
 
         for (int i = 0; i < games.size(); i++) {
-            GameData game = games.get(i);
+            GameData gameData = games.get(i);
             int displayNumber = i + 1;
 
-            gameIDsMap.put(displayNumber, game);
+            gameIDsMap.put(displayNumber, gameData.gameID());
 
-            String white = game.whiteUsername() != null ? game.whiteUsername() : "(empty)";
-            String black = game.blackUsername() != null ? game.blackUsername() : "(empty)";
+            String white = gameData.whiteUsername() != null ? gameData.whiteUsername() : "(empty)";
+            String black = gameData.blackUsername() != null ? gameData.blackUsername() : "(empty)";
 
             System.out.printf("%s%d.%s \"%s\" — White: %s%s%s, Black: %s%s%s%n",
               SET_TEXT_BOLD, displayNumber, RESET,
-              game.gameName(),
+              gameData.gameName(),
               SET_TEXT_COLOR_BLUE, white, RESET,
               SET_TEXT_COLOR_RED, black, RESET);
         }
@@ -166,15 +166,15 @@ public class ChessClient implements NotificationHandler {
             throw new Exception("Invalid game ID – refer to list and select a game ID");
         }
 
-        GameData game = gameIDsMap.get(displayNumber);
-        if (game == null) {
+        GameData gameData = server.getGame(gameIDsMap.get(displayNumber));
+        if (gameData == null) {
             throw new Exception("Invalid game ID – use 'list' to see available games");
         }
 
         String requestedColor = params.length == 2 ? params[1].toUpperCase() : null;
 
-        String white = game.whiteUsername();
-        String black = game.blackUsername();
+        String white = gameData.whiteUsername();
+        String black = gameData.blackUsername();
         boolean isWhite = username != null && username.equals(white);
         boolean isBlack = username != null && username.equals(black);
         boolean alreadyInGame = isWhite || isBlack;
@@ -210,7 +210,7 @@ public class ChessClient implements NotificationHandler {
 
         if (chosenColor != null) {
             try {
-                server.joinGame(game.gameID(), chosenColor);
+                server.joinGame(gameData.gameID(), chosenColor);
             } catch (ResponseException e) {
                 if (e.getMessage().contains("already taken") && alreadyInGame) {
                 } else {
@@ -218,19 +218,19 @@ public class ChessClient implements NotificationHandler {
                 }
             }
         }
-
-        ChessBoardUI.drawBoard(game.game(), perspective, null);
-        joinedGame = game;
+        ChessGame game = gameData.game();
+        ChessBoardUI.drawBoard(game, perspective, null);
+        joinedGameData = gameData;
         state = State.PLAYER;
-        ws.joinGame(authToken, game.gameID());
+        ws.joinGame(authToken, gameData.gameID());
         if (chosenColor != null) {
             if (alreadyInGame) {
-                return String.format("Rejoined game \"%s\" as %s", game.gameName(), chosenColor);
+                return String.format("Rejoined game \"%s\" as %s", gameData.gameName(), chosenColor);
             } else {
-                return String.format("Joined game \"%s\" as %s", game.gameName(), chosenColor);
+                return String.format("Joined game \"%s\" as %s", gameData.gameName(), chosenColor);
             }
         } else {
-            return String.format("Now observing game \"%s\"", game.gameName());
+            return String.format("Now observing game \"%s\"", gameData.gameName());
         }
     }
 
@@ -247,17 +247,17 @@ public class ChessClient implements NotificationHandler {
             throw new Exception("Invalid game ID – refer to list and select a game ID");
         }
 
-        GameData game = gameIDsMap.get(displayNumber);
-        if (game == null) {
+        GameData gameData = server.getGame(gameIDsMap.get(displayNumber));
+        if (gameData == null) {
             throw new Exception("Invalid game ID – refer to list and select a game ID");
         }
 
-        server.observeGame(game.gameID());
-        ChessBoardUI.drawBoard(game.game(), ChessGame.TeamColor.WHITE, null);
-        joinedGame = game;
-        ws.joinGame(authToken, game.gameID());
+        ChessGame game = gameData.game();
+        ChessBoardUI.drawBoard(gameData.game(), ChessGame.TeamColor.WHITE, null);
+        joinedGameData = gameData;
+        ws.joinGame(authToken, gameData.gameID());
         state = State.OBSERVER;
-        return String.format("You are now observing game \"%s\".", game.gameName());
+        return String.format("You are now observing game \"%s\".", gameData.gameName());
     }
 
     public String logout() throws Exception {
@@ -272,10 +272,10 @@ public class ChessClient implements NotificationHandler {
 
     public String redrawBoard() throws Exception {
         assertInGame();
-        ChessGame.TeamColor perspective = joinedGame.blackUsername() == username 
+        ChessGame.TeamColor perspective = joinedGameData.blackUsername() == username 
           ? ChessGame.TeamColor.BLACK 
           : ChessGame.TeamColor.WHITE;
-        ChessBoardUI.drawBoard(joinedGame.game(), perspective, null);
+        ChessBoardUI.drawBoard(joinedGameData.game(), perspective, null);
         return String.format("Board successfully redrawn");
     }
 
@@ -288,12 +288,12 @@ public class ChessClient implements NotificationHandler {
         }
         
         piecePosition = getPosition(params[0]);
-        highlightedPiece = joinedGame.game().getBoard().getPiece(piecePosition);
+        highlightedPiece = joinedGameData.game().getBoard().getPiece(piecePosition);
 
         if (highlightedPiece == null) {
             throw new Exception(String.format("There is no piece at pos: %s", params[0]));
         }
-        Collection<ChessMove> legalMoves = joinedGame.game().validMoves(piecePosition);
+        Collection<ChessMove> legalMoves = joinedGameData.game().validMoves(piecePosition);
         return String.format("Displaying all legal moves for %c at %d", highlightedPiece.toString(), params[0]);
     }
 
@@ -328,15 +328,15 @@ public class ChessClient implements NotificationHandler {
                 promotionPiece = ChessPiece.PieceType.ROOK;
             }
         }
-        ws.makeMove(authToken, joinedGame.gameID(), new ChessMove(start, end, promotionPiece));
+        ws.makeMove(authToken, joinedGameData.gameID(), new ChessMove(start, end, promotionPiece));
         return String.format("Move is being sent. Please wait...");
     }
 
     public String leave() throws Exception {
         assertInGame();
-        ws.leave(authToken, joinedGame.gameID());
+        ws.leave(authToken, joinedGameData.gameID());
         state = State.SIGNEDIN;
-        joinedGame = null;
+        joinedGameData = null;
         return String.format("Successfully left the game.");
     }
 
@@ -349,9 +349,9 @@ public class ChessClient implements NotificationHandler {
             if (confirmation != "resign") {
                 return "Resignation cancelled. Continuing game.";
             }
-            ws.resign(authToken, joinedGame.gameID());
+            ws.resign(authToken, joinedGameData.gameID());
             state = State.SIGNEDIN;
-            joinedGame = null;
+            joinedGameData = null;
             return "Successfully resigned from the game.";
         } catch (Exception e) {
             return "Unable to resign.";
@@ -432,7 +432,7 @@ public class ChessClient implements NotificationHandler {
     }
 
     private boolean checkNeedsPromotion(ChessPosition start, ChessPosition end) {
-        ChessPiece movingPiece = joinedGame.game().getBoard().getPiece(start);
+        ChessPiece movingPiece = joinedGameData.game().getBoard().getPiece(start);
         if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN &&
           (end.getRow() == 1 || end.getRow() == 8)) {
             return true;
@@ -451,12 +451,12 @@ public class ChessClient implements NotificationHandler {
     public void notify(ServerMessage notification) {
         if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGameMessage loadGameMessage = (LoadGameMessage) notification;
-            joinedGame = new GameData(
+            joinedGameData = new GameData(
               loadGameMessage.getGame(),
-              joinedGame.gameID(),
-              joinedGame.gameName(),
-              joinedGame.whiteUsername(),
-              joinedGame.blackUsername());
+              joinedGameData.gameID(),
+              joinedGameData.gameName(),
+              joinedGameData.whiteUsername(),
+              joinedGameData.blackUsername());
             try { 
                 redrawBoard();
             } catch (Exception e) {

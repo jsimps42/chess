@@ -31,6 +31,11 @@ public class ChessBoardUI {
           ChessGame.TeamColor playerColor, 
           Collection<ChessMove> legalMoves) {
         ChessBoard board = game.getBoard();
+        if (board == null) {
+            board = new ChessBoard();
+            board.resetBoard();
+        }
+
         System.out.print(RESET_TEXT + RESET_BG);
         if (playerColor == ChessGame.TeamColor.BLACK) {
             drawBoardBlackPerspective(board, playerColor, legalMoves);

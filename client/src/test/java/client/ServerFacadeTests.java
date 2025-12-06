@@ -191,7 +191,7 @@ public class ServerFacadeTests {
         serverFacade.createGame(new GameData(null, 0, "Test Game", null, null));
         int gameID = serverFacade.listGames().games().iterator().next().gameID();
 
-        assertDoesNotThrow(() -> serverFacade.observeGame(gameID));
+        assertDoesNotThrow(() -> serverFacade.getGame(gameID));
     }
 
     @Test
@@ -199,7 +199,7 @@ public class ServerFacadeTests {
     void observeGameInvalidIDFails() throws Exception {
         serverFacade.register("badobs", "pass", "bo@chess.com");
         ResponseException ex = assertThrows(ResponseException.class, () ->
-          serverFacade.observeGame(9999));
+          serverFacade.getGame(9999));
         assertEquals(400, ex.getStatusCode());
     }
 

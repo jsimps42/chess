@@ -44,10 +44,10 @@ public class ServerFacade {
         this.authToken = null;
     }
 
-    public void createGame(GameData game) throws Exception {
+    public GameData createGame(GameData game) throws Exception {
         var request = buildRequest("POST", "/game", game);
         var response = sendRequest(request);
-        handleResponse(response, null);
+        return handleResponse(response, GameData.class);
     }
 
     public GamesList listGames() throws Exception {
@@ -63,10 +63,10 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public void observeGame(int gameID) throws Exception {
+    public GameData getGame(int gameID) throws Exception {
         var request = buildRequest("GET", "/game/" + gameID, null);
         var response = sendRequest(request);
-        handleResponse(response, null);
+        return handleResponse(response, GameData.class);
     }
 
     public void clear() throws Exception {
