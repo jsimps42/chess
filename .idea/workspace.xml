@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="da651269-3b4b-4f19-90ef-949d0fa95781" name="Changes" comment="Please detect my tests, I have tests already">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/client/.idea/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/.idea/encodings.xml" afterDir="false" />
@@ -60,6 +61,7 @@
       <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessBoard.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessGame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPiece.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPiece.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPosition.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/ChessPosition.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/main/java/exception/ResponseException.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/exception/ResponseException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/main/java/model/GameData.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/model/GameData.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/main/java/model/GamesList.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/model/GamesList.java" afterDir="false" />

@@ -28,7 +28,15 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                    Gson gson = new Gson();
+                    ServerMessage baseNotification = gson.fromJson(message, ServerMessage.class);
+                    ServerMessage notification = switch (baseNotification.getServerMessageType()) {
+                        case LOAD_GAME -> gson.fromJson(message, LoadGameMessage.class);
+                        case NOTIFICATION -> gson.fromJson(message, NotificationMessage.class);
+                        case ERROR -> gson.fromJson(message, ErrorMessage.class);
+                        default -> baseNotification;
+                    };
+
                     notificationHandler.notify(notification);
                 }
             });

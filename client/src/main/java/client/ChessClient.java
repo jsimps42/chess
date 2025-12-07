@@ -322,17 +322,18 @@ public class ChessClient implements NotificationHandler {
 
         if (checkNeedsPromotion(start, end)) {
             String choice = "";
-            while (choice != "QUEEN" && choice != "BISHOP" && choice != "KNIGHT" && choice != "ROOK") {
+            while (!choice.contains("QUEEN") && !choice.contains("BISHOP") && 
+              !choice.contains("KNIGHT") && !choice.contains("ROOK")) {
                 System.out.print("\nChoose your promotion piece (queen, bishop, knight, rook):\n");
                 choice = scanner.nextLine().toUpperCase();
             }
-            if (choice == "QUEEN") {
+            if (choice.contains("QUEEN")) {
                 promotionPiece = ChessPiece.PieceType.QUEEN;
             }
-            else if (choice == "BISHOP") {
+            else if (choice.contains("BISHOP")) {
                 promotionPiece = ChessPiece.PieceType.BISHOP;
             }
-            else if (choice == "KNIGHT") {
+            else if (choice.contains("KNIGHT")) {
                 promotionPiece = ChessPiece.PieceType.KNIGHT;
             }
             else {
@@ -369,8 +370,6 @@ public class ChessClient implements NotificationHandler {
                 return "Resignation cancelled. Continuing game.";
             }
             ws.resign(authToken, joinedGameData.gameID());
-            state = State.SIGNEDIN;
-            joinedGameData = null;
             return "Successfully resigned from the game.";
         } catch (Exception e) {
             return "Unable to resign.";
@@ -479,7 +478,7 @@ public class ChessClient implements NotificationHandler {
 
             System.out.print("\033[2K\033[1A\033[2K");
             try {
-                redrawBoard();
+                ChessBoardUI.drawBoard(loadMsg.getGame(), playerColor, null);
             } catch (Exception ignored) {}
 
             printPrompt();

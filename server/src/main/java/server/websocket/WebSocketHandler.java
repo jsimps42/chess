@@ -263,9 +263,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
-        String start = move.getStartPosition().toString();
-        String end = move.getEndPosition().toString();
-        String notificationText = connection.username + " moved " + start + " to " + end;
+        String notificationText = connection.username + ": " + move.toString();
         connections.broadcast(session, new NotificationMessage(notificationText), gameData.gameID());
         
         ChessGame.TeamColor otherTeam;
@@ -304,5 +302,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throw new DataAccessException(e.getMessage());
         }
         connections.broadcastAll(new LoadGameMessage(game, gameData.gameID()), gameData.gameID());
+    }
+
+    String parsePosition(ChessPosition pos) {
+        return String.format("%c%d", (char) ('a' + pos.getColumn() - 1), (char) pos.getRow() + '0');    
     }
 }
