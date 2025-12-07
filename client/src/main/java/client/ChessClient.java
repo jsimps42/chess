@@ -28,6 +28,7 @@ public class ChessClient implements NotificationHandler {
     private GameData joinedGameData = null;
     private final WebSocketFacade ws;
     private ChessGame.TeamColor playerColor = null;
+    private Scanner scanner;
 
     public ChessClient(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
@@ -38,7 +39,7 @@ public class ChessClient implements NotificationHandler {
         System.out.println(LOGO + " Welcome to chess. Sign in to start.");
         System.out.println(help());
 
-        Scanner scanner = new Scanner(System.in);
+        scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
             printPrompt();
@@ -301,11 +302,8 @@ public class ChessClient implements NotificationHandler {
         if (highlightedPiece == null) {
             throw new Exception(String.format("There is no piece at pos: %s", params[0]));
         }
-        ChessGame.TeamColor perspective = joinedGameData.blackUsername() == username 
-          ? ChessGame.TeamColor.BLACK 
-          : ChessGame.TeamColor.WHITE;
         Collection<ChessMove> legalMoves = joinedGameData.game().validMoves(piecePosition);
-        ChessBoardUI.drawBoard(joinedGameData.game(), perspective, legalMoves);
+        ChessBoardUI.drawBoard(joinedGameData.game(), playerColor, legalMoves);
         return String.format("Displaying all legal moves for piece at %s", params[0]);
     }
 
@@ -322,10 +320,9 @@ public class ChessClient implements NotificationHandler {
         ChessPiece.PieceType promotionPiece = null;
 
         if (checkNeedsPromotion(start, end)) {
-            Scanner scanner = new Scanner(System.in);
             String choice = "";
             while (choice != "QUEEN" && choice != "BISHOP" && choice != "KNIGHT" && choice != "ROOK") {
-                System.out.print("\nChoose your promotion piece (queen, bishop, knight, rook): ");
+                System.out.print("\nChoose your promotion piece (queen, bishop, knight, rook):\n");
                 choice = scanner.nextLine().toUpperCase();
             }
             if (choice == "QUEEN") {
@@ -365,10 +362,9 @@ public class ChessClient implements NotificationHandler {
         assertPlayer();
         joinedGameData = server.getGame(joinedGameData.gameID());
          try {
-            System.out.print("This will end the current game.\nType 'resign' again to confirm your resignation: ");
-            Scanner scanner = new Scanner(System.in);
+            System.out.print("This will end the current game.\nType 'resign' again to confirm your resignation:\n");
             String confirmation = scanner.nextLine().toLowerCase();
-            if (confirmation != "resign") {
+            if (!confirmation.contains("resign")) {
                 return "Resignation cancelled. Continuing game.";
             }
             ws.resign(authToken, joinedGameData.gameID());
