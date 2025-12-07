@@ -57,7 +57,7 @@ public class ChessBoardUI {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 ChessPosition pos = new ChessPosition(row + 1, col + 1);
                 ChessPiece piece = board.getPiece(pos);
-                boolean isLight = isLightInWhiteView(row, col);
+                boolean isLight = isLightSquare(row, col);
                 boolean highlight = false;
                 if (squaresToHighlight != null ) {
                     highlight = squaresToHighlight.contains(pos);
@@ -85,10 +85,10 @@ public class ChessBoardUI {
         
         for (int row = 0; row < BOARD_SIZE; row++) {
             printRowLabel(row + 1);
-            for (int col = 0; col < BOARD_SIZE; col++) {
+            for (int col = BOARD_SIZE - 1; col >= 0; col--) {
                 ChessPosition pos = new ChessPosition(row + 1, col + 1);
                 ChessPiece piece = board.getPiece(pos);
-                boolean isLight = isLightInBlackView(row, col);
+                boolean isLight = isLightSquare(row, col);
                 boolean highlight = false;
                 if (squaresToHighlight != null ) {
                     highlight = squaresToHighlight.contains(pos);
@@ -108,12 +108,8 @@ public class ChessBoardUI {
         printHeader(false);
     }
 
-    private static boolean isLightInWhiteView(int row, int col) {
+    private static boolean isLightSquare(int row, int col) {
         return ((row + col) % 2) == 1;
-    }
-
-    private static boolean isLightInBlackView(int row, int col) {
-        return ((row + col) % 2) == 0;
     }
 
     private static void printHeader(boolean whitePerspective) {

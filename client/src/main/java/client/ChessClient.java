@@ -59,6 +59,7 @@ public class ChessClient implements NotificationHandler {
 
     private void printPrompt() {
         System.out.print("\n" + RESET + ">>> " + GREEN);
+        System.out.flush();
     }
 
     public String eval(String input) {
@@ -468,27 +469,30 @@ public class ChessClient implements NotificationHandler {
     @Override
     public void notify(ServerMessage notification) {
         if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            LoadGameMessage loadGameMessage = (LoadGameMessage) notification;
+            LoadGameMessage loadMsg = (LoadGameMessage) notification;
             joinedGameData = new GameData(
-              loadGameMessage.getGame(),
-              joinedGameData.gameID(),
-              joinedGameData.gameName(),
-              joinedGameData.whiteUsername(),
-              joinedGameData.blackUsername());
-            try { 
+              loadMsg.getGame(),
+              joinedGameData != null ? joinedGameData.gameID() : loadMsg.getGameID(),
+              joinedGameData != null ? joinedGameData.gameName() : "Game",
+              joinedGameData != null ? joinedGameData.whiteUsername() : null,
+              joinedGameData != null ? joinedGameData.blackUsername() : null);
+
+            System.out.print("\033[2K\033[1A\033[2K");
+            try {
                 redrawBoard();
-            } catch (Exception e) {
-            }
-        }
+            } catch (Exception ignored) {}
 
-        else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-            ErrorMessage errorMessage = (ErrorMessage) notification;
-            System.out.println(errorMessage.getErrorMessage());
+            printPrompt();
         }
-
         else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-            NotificationMessage notificationMessage = (NotificationMessage) notification;
-            System.out.println(notificationMessage.getNotificationMessage());
+            NotificationMessage note = (NotificationMessage) notification;
+            System.out.println("\n◉ " + note.getNotificationMessage() + RESET);
+            printPrompt();
+        }
+        else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+            ErrorMessage err = (ErrorMessage) notification;
+            System.out.println("\n" + RED + "Error: " + err.getErrorMessage() + RESET);
+            printPrompt();
         }
     }
 }
