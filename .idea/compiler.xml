@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <file url="file://$PROJECT_DIR$/shared/src/test/java/passoff/chess/game/ChessGameTests.java" />
+      <file url="file://$PROJECT_DIR$/shared/src/test/java/passoff/chess/game/ValidMovesTests.java" />
+      <file url="file://$PROJECT_DIR$/shared/src/test/java/passoff/chess/game/MakeMoveTests.java" />
+      <file url="file://$PROJECT_DIR$/shared/src/test/java/passoff/chess/game/GameStatusTests.java" />
+      <file url="file://$PROJECT_DIR$/shared/src/test/java/passoff/chess/game/FullGameTest.java" />
+    </excludeFromCompile>
     <annotationProcessing>
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />

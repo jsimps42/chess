@@ -27,6 +27,7 @@ public class ChessClient implements NotificationHandler {
     private final HashMap<Integer, Integer> gameIDsMap = new HashMap<>();
     private GameData joinedGameData = null;
     private final WebSocketFacade ws;
+    private ChessGame.TeamColor playerColor = null;
 
     public ChessClient(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
@@ -226,6 +227,7 @@ public class ChessClient implements NotificationHandler {
         ChessBoardUI.drawBoard(game, perspective, null);
         joinedGameData = gameData;
         state = State.PLAYER;
+        playerColor = perspective;
         ws.joinGame(authToken, gameData.gameID());
         if (chosenColor != null) {
             if (alreadyInGame) {
@@ -280,10 +282,7 @@ public class ChessClient implements NotificationHandler {
     public String redrawBoard() throws Exception {
         assertInGame();
         joinedGameData = server.getGame(joinedGameData.gameID());
-        ChessGame.TeamColor perspective = joinedGameData.blackUsername() == username 
-          ? ChessGame.TeamColor.BLACK 
-          : ChessGame.TeamColor.WHITE;
-        ChessBoardUI.drawBoard(joinedGameData.game(), perspective, null);
+        ChessBoardUI.drawBoard(joinedGameData.game(), playerColor, null);
         return String.format("Board successfully redrawn");
     }
 
@@ -358,6 +357,7 @@ public class ChessClient implements NotificationHandler {
         ws.leave(authToken, joinedGameData.gameID());
         state = State.SIGNEDIN;
         joinedGameData = null;
+        playerColor = null;
         return String.format("Successfully left the game.");
     }
 

@@ -86,7 +86,7 @@ public class ChessBoardUI {
         for (int row = 0; row < BOARD_SIZE; row++) {
             printRowLabel(row + 1);
             for (int col = 0; col < BOARD_SIZE; col++) {
-                ChessPosition pos = new ChessPosition(8 - row, 8 - col);
+                ChessPosition pos = new ChessPosition(row + 1, col + 1);
                 ChessPiece piece = board.getPiece(pos);
                 boolean isLight = isLightInBlackView(row, col);
                 boolean highlight = false;

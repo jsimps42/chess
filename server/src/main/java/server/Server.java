@@ -54,9 +54,9 @@ public class Server {
         server.put("/game", gameHandler::joinGame);
 
         server.ws("ws", ws -> {
-            ws.onConnect(webSocketHandler);
-            ws.onMessage(webSocketHandler);
-            ws.onClose(webSocketHandler);
+            ws.onConnect(ctx -> webSocketHandler.handleConnect(ctx));
+            ws.onMessage(ctx -> webSocketHandler.handleMessage(ctx));
+            ws.onClose(ctx -> webSocketHandler.handleClose(ctx));
         });
 
         server.exception(BadRequestException.class, (e, ctx) -> ctx.status(400).json(new ErrorResponse("Error: bad request")));
